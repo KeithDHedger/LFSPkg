@@ -16,3 +16,9 @@ install:
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
 	cp $(RCFILE) $(DESTDIR)/etc
 	cp $(FUNCTIONS) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
+
+	@echo "*********************************************************"
+	@echo "Now set your package options in the file /etc/lfspkg.rc"
+	@echo "See the manpage for details, but you should set at least:"
+	@echo "OUTPUT and SOURCEARCHIVES"
+	@echo "*********************************************************"
