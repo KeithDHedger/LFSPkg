@@ -1,0 +1,18 @@
+OUTPUT=${OUTPUT:-/tmp/LFS}
+SOURCEARCHIVES=${SOURCEARCHIVES:-/tmp/LFSSourceArchives}
+BUILDSCRIPTS=${BUILDSCRIPTS:-"/LFSPkgBuildScripts/"}
+EXITONFAIL=${EXITONFAIL:-1}
+CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
+CHECKETC=${CHECKETC:-1}
+MAKEFLAGS=${MAKEFLAGS:-" -j4 "}
+XORG_PREFIX=${XORG_PREFIX:-"/usr"}
+XORG_CONFIG=${XORG_CONFIG:-"--prefix=$XORG_PREFIX --sysconfdir=/etc --mandir=$XORG_PREFIX/share/man --localstatedir=/var --disable-static"}
+JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
+
+CMAKEINSTALLPREFIX="-DCMAKE_INSTALL_PREFIX=/usr"
+CMAKEPREFIXPATH="-DCMAKE_PREFIX_PATH=/usr/lib64/qt5/cmake"
+CMAKELIBDIRSUFFIX="-DLIB_SUFFIX=64"
+CMAKEUSEQT5="-DUSE_QT5=TRUE"
+CMAKELDFLAGS="-DCMAKE_EXE_LINKER_FLAGS='-L/usr/lib64/qt5'"
+
+LFSVERSION=7.7
