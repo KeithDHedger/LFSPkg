@@ -20,11 +20,16 @@ install:
 	cp $(RCFILE) $(DESTDIR)/etc
 	cp $(FUNCTIONS) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
 
-	@echo "*********************************************************"
+	@echo "**************************************************************"
 	@echo "Now set your package options in the file /etc/lfspkg.rc"
 	@echo "See the manpage for details, but you should set at least:"
 	@echo "OUTPUT and SOURCEARCHIVES"
-	@echo "*********************************************************"
+	@echo
+	@echo "You should also download the buildscripts from here:"
+	@echo "https://github.com/KeithDHedger/LFSPkgBuilds"
+	@echo "Place LFSPkgBuildScripts and LFSScripts in / ."
+	@echo "If you place them elsewhere set BUILDSCRIPTS in /etc/lfspkg.rc"
+	@echo "**************************************************************"
 
 uninstall:
 	rm $(DESTDIR)$(PREFIX)/bin/$(HELPER)
