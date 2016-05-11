@@ -236,7 +236,7 @@ checketc ()
 
 gettar ()
 {
-	local url="$1" tarname
+	local url="$1" tarname outname
 	local section
 
 	if [ ${NODOWNLOAD:-0} -eq 1 ];then
@@ -249,6 +249,13 @@ gettar ()
 		section=""
 	fi
  
+ 	if [ "X$3" != "X" ];then
+		outname="-O $3"
+	else
+		outname=""
+	fi
+ 
+
 	if [ ! -e "$SOURCEARCHIVES" ];then
 		mkdir -vp "$SOURCEARCHIVES"||true
 	fi
@@ -267,7 +274,7 @@ gettar ()
 			return
 		fi
 
-		if ! wget --no-check-certificate -c "$url";then
+		if ! wget --no-check-certificate -c "$url" $outname;then
 			echo "!!!!!!!Can't download file $1!!!!!"
 			if [ $EXITONFAIL -eq 1 ];then
 				popd
@@ -361,6 +368,7 @@ makepkginfo ()
 				esac
 
 				if [ X"$page" != "X" ];then
+					echo "$page"
 					if [ ! -e ${appname}.html ];then
 						wget $page -O ${appname}.html 2>/dev/null
 					fi
@@ -389,6 +397,70 @@ makepkginfo ()
 					fi
 					infodata=$(tail -n11 ${appname}-info|tr "\n" "|"|sed "s@${appname}:[ ]*@@Ig;s@[|][|]*@\n@g")
 					echo "$infodata"
+					return
+				fi
+			done
+	echo -e "${RED}No info found ..." 1>&2
+	popd &>/dev/null
+}
+
+showwebpage ()
+{
+	local appname="$1"
+	local page
+	local subpage
+	local infodata
+	local vers
+
+	pushd "${DATABASEFOLDER}" &>/dev/null
+		for usepage in "blfsstable" "lfsstable" "blfsdev" "lfsdev"
+			do
+				page=""
+				case $usepage in
+					"blfsstable")
+						echo -e "${GREEN}Checking BLFS (stable) for $appname version ...${NORMAL}" 1>&2
+						subpage=$(cat blfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+						if [ X${subpage} != "X" ];then
+							page="http://www.linuxfromscratch.org/blfs/view/stable/${subpage}"
+						fi
+						;;
+					"lfsstable")
+						echo -e "${GREEN}Checking LFS (stable) for $appname version ...${NORMAL}" 1>&2
+						subpage=$(cat lfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+						if [ X${subpage} != "X" ];then
+							page="http://www.linuxfromscratch.org/lfs/view/stable/${subpage}"
+						fi
+						;;
+					"blfsdev")
+						echo -e "${GREEN}Checking BLFS (development) for $appname version ...${NORMAL}" 1>&2
+						subpage=$(cat blfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+						if [ X${subpage} != "X" ];then
+							page="http://www.linuxfromscratch.org/blfs/view/svn/${subpage}"
+						fi
+						;;
+					"lfsdev")
+						echo -e "${GREEN}Checking LFS (development) for $appname version ...${NORMAL}" 1>&2
+						subpage=$(cat lfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+						if [ X${subpage} != "X" ];then
+							page="http://www.linuxfromscratch.org/lfs/view/development/${subpage}"
+						fi
+						;;
+				esac
+
+				if [ X"$page" != "X" ];then
+					xdg-open "$page"
+					return
+				fi
+			done
+
+		for vers in "14.1" "14.0" "13.37" "13.1"
+			do
+				echo -e "${GREEN}Checking Slackbuilds version $vers for Info ...${NORMAL}" 1>&2
+				subpage=$(grep -i "SLACKBUILD LOCATION:[ ]*\./[[:alnum:]]*/${appname}$" "${vers}.txt" 2>/dev/null)||true
+				if [ X"${subpage}" != "X" ];then
+					subpage=${subpage#?*./}
+					page="http://slackbuilds.org/slackbuilds/$vers/${subpage}"
+					xdg-open "$page"
 					return
 				fi
 			done

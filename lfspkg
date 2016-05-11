@@ -1,21 +1,10 @@
 #!/bin/bash
 
-# ©K. D. Hedger. Fri  8 Jan 11:28:31 GMT 2016 keithhedger@keithhedger.darktech.org
-#
-# This file (lfspkg) is part of LFSPkg.
-#
-# GithubProjects is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# at your option) any later version.
-#
-# GithubProjects is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with GithubProjects.  If not, see <http://www.gnu.org/licenses/>.
+############################################################
+#keithhedger
+#Wed 11 May 20:10:23 BST 2016
+#Built using: makeswitch -c LFSMakePkg.conf
+############################################################
 
 OPTCOUNT=0
 
@@ -50,6 +39,7 @@ NOTINSTALLED=0
 INSTALLED=0
 DEPENDSON=0
 CHECKALL=0
+WEBPAGE=""
 
 while [ $# -gt 0 ]
 do
@@ -134,6 +124,10 @@ do
 		-P|--checkall)
 			CHECKALL=1
 			;;
+		-W|--webpage)
+			WEBPAGE="$2"
+			shift
+			;;
 		-N|--noaskroot)
 			NOASKROOT=1
 			;;
@@ -193,6 +187,7 @@ do
 			echo "-E|--installed : List installed packages"
 			echo "-O|--dependson : Find packages that depend on ARG"
 			echo "-P|--checkall : Check all packages for possible upgrade"
+			echo "-W|--webpage : Try to find webpage for build"
 			echo "-N|--noaskroot : Don't check for root user"
 			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
 			echo "-s|--suffix : Suffix of package"
@@ -789,6 +784,11 @@ main ()
 
 	if [ "X$INFO" != "X" ];then
 		makepkginfo "$INFO"
+		return
+	fi
+
+	if [ "X$WEBPAGE" != "X" ];then
+		showwebpage "$WEBPAGE"
 		return
 	fi
 
