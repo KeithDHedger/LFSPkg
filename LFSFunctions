@@ -140,6 +140,8 @@ checkversion ()
 	mult=1
 	for ((j=${#val1[@]}-1;j>-1;j--))
 		do
+			value1=$((10#$value1))
+			val1[$j]=$((10#${val1[$j]}))
 			value1=$(($value1+(${val1[$j]}*mult)))
 			mult=$((mult*100))
 		done
@@ -147,6 +149,8 @@ checkversion ()
 	mult=1
 	for ((j=${#val2[@]}-1;j>-1;j--))
 		do
+			value2=$((10#$value2))
+			val2[$j]=$((10#${val2[$j]}))
 			value2=$(($value2+(${val2[$j]}*mult)))
 			mult=$((mult*100))
 		done

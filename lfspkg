@@ -2,9 +2,13 @@
 
 ############################################################
 #keithhedger
-#Wed 11 May 20:10:23 BST 2016
+#Sat 29 Apr 16:03:40 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
+
+if [ -e lfspkg.include ];then
+	. lfspkg.include
+fi
 
 OPTCOUNT=0
 
