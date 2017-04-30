@@ -14,7 +14,7 @@ clean:
 
 install:
 	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)/etc $(DESTDIR)$(PREFIX)/share/man/man1||true
-	g++ -fPIC -c -o $(HELPER) $(HELPERCODE)
+	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
 	cp $(RCFILE) $(DESTDIR)/etc
