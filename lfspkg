@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sat 29 Apr 16:03:40 BST 2017
+#Mon  1 May 14:37:43 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -752,7 +752,9 @@ finddependants ()
 	echo "Dependencies for ${dep}:"
 	for((j=1;j<totallines;j=j+7))
 		do
-			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i $dep)
+#XXXXXXXXXXXXXx
+#			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b")
+			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b-[0-9].*")
 			if [ X"$doesdepend" != "X" ];then
 				name=$(sed -n "$((j+1))p" "$DATABASE"|awk -F= '{print $2}')
 				version=$(sed -n "$((j+2))p" "$DATABASE"|awk -F= '{print $2}')
@@ -904,9 +906,9 @@ main ()
 		fi
 
 		if [ $defaultdata -eq 0 ];then
-			sed -n "/name=${OPTS[0]}/I,/Installed version=/p" "$DATABASE"
+			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"
 		else
-			sed -n "/name=${OPTS[0]}/I,/Installed version=/p" "$DATABASE"|sed -n "${defaultdata}p"|awk -F= '{print $2}'
+			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${defaultdata}p"|awk -F= '{print $2}'
 		fi
 		return
 	fi
