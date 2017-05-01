@@ -556,9 +556,9 @@ checkforversion ()
 							if [ ! -e ${appname}.html ];then
 								wget $page -O ${appname}.html 2>/dev/null
 							fi
-							infodata=$(cat ${appname}.html|grep -i $appname|head -n1)
+							infodata=$(cat ${appname}.html|grep -i "\b$appname\b"|head -n1)
 							vers=${infodata##?*-}
-							infodata=$(sed -n "/name=${appname}/I,/Installed version=/p" "${DATABASE}")
+							infodata=$(sed -n "/name=\b${appname}\b/I,/Installed version=/p" "${DATABASE}")
 							packageversion=$(echo "$infodata"|sed -n '2p'|awk -F= '{print $2}')
 							printversioninfo $vers $packageversion $appname "$infodata"
 							echo "More info here: $page"

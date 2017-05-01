@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon  1 May 14:37:43 BST 2017
+#Mon  1 May 19:52:21 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -222,7 +222,7 @@ if [ X"$THISTTY" = "X" ];then
 fi
 
 . /usr/share/LFSPkg/LFSFunctions
-#. /media/LinuxData/Development/Projects/LFSMakePkg/LFSFunctions
+#. ./LFSFunctions
 
 init ()
 {
