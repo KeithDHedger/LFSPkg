@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon  1 May 19:52:21 BST 2017
+#Tue  2 May 16:30:30 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -699,7 +699,7 @@ builddeps()
 		do
 			if [ "X${SCRIPT:7:5}" = "XERROR" ];then
 				echo $SCRIPT
-				echo -e "${RED}ABORTING !!!${BLACK}"
+				echo -e "${RED}ABORTING !!!${NORMAL}"
 				exit 100
 			fi
 
@@ -707,7 +707,7 @@ builddeps()
 				savestdin
 					what=${SCRIPT##?* }
 					if ! NODEPS=true ./$(basename $SCRIPT) $what;then
-						echo -e "${RED}Build error with $SCRIPT...${BLACK}"
+						echo -e "${RED}Build error with $SCRIPT...${NORMAL}"
 						restorestdin
 						exit -1
 					fi
