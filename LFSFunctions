@@ -9,6 +9,8 @@ RED='\e[1;31m'
 GREEN='\e[1;32m'
 BLACK='\e[0;30m'
 NORMAL='\e[0;0m'
+BLUE='\e[1;34m'
+
 
 ARCH=${ARCH:-$(uname -m)}
 case "$ARCH" in
@@ -133,8 +135,28 @@ findnextpair ()
 
 checkversion ()
 {
-	val1=( ${1//./ } )
-	val2=( ${2//./ } )
+	local maxlen=0
+	local val1=( ${1//./ } )
+	local val2=( ${2//./ } )
+	local value1
+	local value2
+	local j
+	local mult
+
+	maxlen=${#val1[@]}
+
+	if [ ${#val2[@]} -gt $maxlen ];then
+		maxlen=${#val2[@]}
+	fi
+	for ((j=0;j<$maxlen;j++))
+		do
+			if [ "X${val1[$j]}" = "X" ];then
+				val1[$j]=0
+			fi
+			if [ "X${val2[$j]}" = "X" ];then
+				val2[$j]=0
+			fi
+		done
 
 	value1=0
 	mult=1
@@ -476,17 +498,19 @@ printversioninfo ()
 {
 	case $(checkversion $1 $2) in
 		1)
-			echo "Package $3 may need updating to $1"
-			echo "$4"
+			echo -e "${BLUE}Package $3 may need updating to $1${NORMAL}" >&2
+#			echo "$4"
 			;;
 		-1)
-			echo "Package $3 build script version greater than documented version ???"
-			echo "Package $3 build script version=$2, documented version=$1"
+			echo -e "${RED}Package $3 build script version greater than documented version ???${NORMAL}" >&2
+			echo -e "${RED}Package $3 build script version=$2, documented version=$1${NORMAL}" >&2
+			
 			;;
 		0)
-			echo "Package $3 version $2 is Ok ..."
+			echo -e "${GREEN}Package $3 version $2 is Ok ...${NORMAL}" >&2
 			;;
 	esac
+	echo "$4"
 }
 
 checkforversion ()
@@ -503,16 +527,9 @@ checkforversion ()
 		for packages in ${OPTS[@]}
 			do
 				appname=$packages
-				for usepage in "blfsstable" "lfsstable" "14.1" "14.0" "13.37" "13.1" "blfsdev" "lfsdev"
+				for usepage in "lfsstable" "blfsstable" "14.1" "14.0" "13.37" "13.1" "lfsdev" "blfsdev"
 					do
 						case $usepage in
-							"blfsstable")
-								echo -e "${GREEN}Checking BLFS (stable) for $appname version ...${NORMAL}" 1>&2
-								subpage=$(cat blfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
-								if [ X${subpage} != "X" ];then
-									page="http://www.linuxfromscratch.org/blfs/view/stable/${subpage}"
-								fi
-								;;
 							"lfsstable")
 								echo -e "${GREEN}Checking LFS (stable) for $appname version ...${NORMAL}" 1>&2
 								subpage=$(cat lfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
@@ -520,11 +537,11 @@ checkforversion ()
 									page="http://www.linuxfromscratch.org/lfs/view/stable/${subpage}"
 								fi
 								;;
-							"blfsdev")
-								echo -e "${GREEN}Checking BLFS (development) for $appname version ...${NORMAL}" 1>&2
-								subpage=$(cat blfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+							"blfsstable")
+								echo -e "${GREEN}Checking BLFS (stable) for $appname version ...${NORMAL}" 1>&2
+								subpage=$(cat blfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
 								if [ X${subpage} != "X" ];then
-									page="http://www.linuxfromscratch.org/blfs/view/svn/${subpage}"
+									page="http://www.linuxfromscratch.org/blfs/view/stable/${subpage}"
 								fi
 								;;
 							"lfsdev")
@@ -534,7 +551,13 @@ checkforversion ()
 									page="http://www.linuxfromscratch.org/lfs/view/development/${subpage}"
 								fi
 								;;
-
+							"blfsdev")
+								echo -e "${GREEN}Checking BLFS (development) for $appname version ...${NORMAL}" 1>&2
+								subpage=$(cat blfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
+								if [ X${subpage} != "X" ];then
+									page="http://www.linuxfromscratch.org/blfs/view/svn/${subpage}"
+								fi
+								;;
 							*)
 								echo -e "${GREEN}Checking Slackbuilds version $usepage for $appname version ...${NORMAL}" 1>&2
 								linenumber=$(grep --line-number -i "SLACKBUILD NAME:[ ]*${appname}$" "${usepage}.txt"|awk -F: '{print $1}')
@@ -556,12 +579,11 @@ checkforversion ()
 							if [ ! -e ${appname}.html ];then
 								wget $page -O ${appname}.html 2>/dev/null
 							fi
-							infodata=$(cat ${appname}.html|grep -i "\b$appname\b"|head -n1)
+							infodata=$(cat ${appname}.html|grep -i "\b$appname\b"|head -n1)							
 							vers=${infodata##?*-}
 							infodata=$(sed -n "/name=\b${appname}\b/I,/Installed version=/p" "${DATABASE}")
 							packageversion=$(echo "$infodata"|sed -n '2p'|awk -F= '{print $2}')
 							printversioninfo $vers $packageversion $appname "$infodata"
-							echo "More info here: $page"
 							continue 2
 						fi
 					done

@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue  2 May 16:30:30 BST 2017
+#Fri  5 May 15:58:00 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -221,8 +221,11 @@ if [ X"$THISTTY" = "X" ];then
 	export THISTTY=$(tty)
 fi
 
+if [ "X$LOCAL" != "X" ];then
+	. ./LFSFunctions
+else
 . /usr/share/LFSPkg/LFSFunctions
-#. ./LFSFunctions
+fi
 
 init ()
 {
@@ -736,7 +739,7 @@ updatedatabase ()
 				done
 		popd &>/dev/null
 	fi
-	finddepends  ${BUILDSCRIPTS} "${ROOTDIR}" L> "${DATABASE}"
+	finddepends "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
 }
 
 finddependants ()
