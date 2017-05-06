@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Fri  5 May 15:58:00 BST 2017
+#Sat  6 May 17:16:10 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -44,6 +44,7 @@ INSTALLED=0
 DEPENDSON=0
 CHECKALL=0
 WEBPAGE=""
+NOCOLOUR=0
 
 while [ $# -gt 0 ]
 do
@@ -132,6 +133,9 @@ do
 			WEBPAGE="$2"
 			shift
 			;;
+		-K|--nocolour)
+			NOCOLOUR=1
+			;;
 		-N|--noaskroot)
 			NOASKROOT=1
 			;;
@@ -192,6 +196,7 @@ do
 			echo "-O|--dependson : Find packages that depend on ARG"
 			echo "-P|--checkall : Check all packages for possible upgrade"
 			echo "-W|--webpage : Try to find webpage for build"
+			echo "-K|--nocolour : Use colour in output default=on"
 			echo "-N|--noaskroot : Don't check for root user"
 			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
 			echo "-s|--suffix : Suffix of package"
@@ -222,9 +227,11 @@ if [ X"$THISTTY" = "X" ];then
 fi
 
 if [ "X$LOCAL" != "X" ];then
+	FINDHELPER=./finddepends
 	. ./LFSFunctions
 else
-. /usr/share/LFSPkg/LFSFunctions
+	. /usr/share/LFSPkg/LFSFunctions
+	FINDHELPER=$(which finddepends)
 fi
 
 init ()
@@ -716,7 +723,7 @@ builddeps()
 					fi
 				restorestdin
 			popd
-		done < <(finddepends ${BUILDSCRIPTS} ${ROOTDIR}/ B "$BUILDDEPS")
+		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ B "$BUILDDEPS")
 }
 
 updatedatabase ()
@@ -739,7 +746,7 @@ updatedatabase ()
 				done
 		popd &>/dev/null
 	fi
-	finddepends "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
+	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
 }
 
 finddependants ()
@@ -755,7 +762,6 @@ finddependants ()
 	echo "Dependencies for ${dep}:"
 	for((j=1;j<totallines;j=j+7))
 		do
-#XXXXXXXXXXXXXx
 #			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b")
 			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b-[0-9].*")
 			if [ X"$doesdepend" != "X" ];then
@@ -771,8 +777,16 @@ main ()
 {
 	local defaultdata
 
+	if [ $NOCOLOUR -eq 1 ];then
+		RED=""
+		GREEN=""
+		BLACK=""
+		NORMAL=""
+		BLUE=""
+	fi
+
 	if [ X"$FINDDEPENDS" != "X" ];then
-		finddepends ${BUILDSCRIPTS} ${LFSPKGFOLDER} D "$FINDDEPENDS"
+		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} D "$FINDDEPENDS"
 		return
 	fi
 
@@ -877,12 +891,12 @@ main ()
 	fi
 
 	if [ $NOTINSTALLED -eq 1 ];then
-		finddepends ${BUILDSCRIPTS} ${ROOTDIR}/ U
+		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ U
 		return
 	fi
 
 	if [ $INSTALLED -eq 1 ];then
-		finddepends ${BUILDSCRIPTS} ${ROOTDIR}/ I
+		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ I
 		return
 	fi
 

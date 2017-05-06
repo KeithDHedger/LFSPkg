@@ -144,8 +144,11 @@ void getData(void)
 	char	line[2048];
 	int		fd;
 	int 	dataread=-1;
+	char	*scriptpath=NULL;
 
-	fd=open(scripts[numScripts].scriptPath,O_RDONLY);
+	asprintf(&scriptpath,"%s%s",rootFolder,scripts[numScripts].scriptPath);
+//	fd=open(scripts[numScripts].scriptPath,O_RDONLY);
+	fd=open(scriptpath,O_RDONLY);
 	if(fd!=-1)
 		{
 			dataread=read(fd,&line[0],2047);
@@ -168,6 +171,7 @@ void getData(void)
 			fprintf(stdout,RED "ERROR " NORMAL "Can't open file %s\n",scripts[numScripts].scriptPath);
 			exit(200);
 		}
+	free(scriptpath);
 }
 
 void getScripts(void)
@@ -175,12 +179,13 @@ void getScripts(void)
 	char*	command;
 	char	line[1024];
 	FILE*	fp;
+	char	*sf=NULL;
 
-	asprintf(&command,"find %s -mindepth 3 -maxdepth 3 -iname \"*.LFSBuild\"|sort",scriptsFolder);
+	asprintf(&command,"find %s%s -mindepth 3 -maxdepth 3 -iname \"*.LFSBuild\"|sort",rootFolder,scriptsFolder);
 	fp=popen(command,"r");
 	while(fgets(line,1024,fp)!=NULL)
 		{
-			scripts[numScripts].scriptPath=strndup((char*)line,strlen(line)-1);
+			scripts[numScripts].scriptPath=strndup((char*)&line[strlen(rootFolder)],strlen(line)-1-strlen(rootFolder));
 			scripts[numScripts].checked=false;
 			getData();
 			numScripts++;
@@ -202,8 +207,7 @@ void getScripts(void)
 int getScriptStructFromName(char* name)
 {
 	int	retval=-1;
-
-	for(int j=0; j<numScripts; j++)
+	for(int j=0; j<numScripts;j++)
 		{
 			if(strcasecmp(scripts[j].name,name)==0)
 				{
@@ -378,7 +382,6 @@ void listDepends(char* depstr)
 					scriptnum=getScriptStructFromName(wantname);
 					if(scripts[scriptnum].checked==true)
 						return;
-
 					if(scriptnum==-1)
 						{
 							fprintf(stdout,RED "ERROR " NORMAL "No available build script for %s\n" NORMAL,strippedstring);
@@ -402,9 +405,6 @@ void listDepends(char* depstr)
 					dependsList[numDepends].scriptPath=scripts[scriptnum].scriptPath;
 					if(quiet==false)
 						fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
-
-//					fprintf(stderr,BLUE "\rFound dependency "  NORMAL);
-//					fprintf(stdout,"%s \n",strippedstring);
 
 					if(scripts[scriptnum].installed==true)
 						{
@@ -474,6 +474,8 @@ int main(int argc, char **argv)
 
 	scriptsFolder=argv[scriptsArg];
 	rootFolder=argv[rootArg];
+
+//	asprintf(&scriptsFolder,"%s%s",rootFolder,argv[scriptsArg]);
 	asprintf(&libFolder,"%s/var/lib/lfspkg/packages",rootFolder);
 	getScripts();
 
