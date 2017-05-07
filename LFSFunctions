@@ -11,6 +11,7 @@ BLACK='\e[0;30m'
 NORMAL='\e[0;0m'
 BLUE='\e[1;34m'
 
+SCRIPTLOG=${SCRIPTLOG:-0}
 
 ARCH=${ARCH:-$(uname -m)}
 case "$ARCH" in
@@ -48,6 +49,20 @@ if [ ! -d "$SOURCEARCHIVES" ];then mkdir -p "$SOURCEARCHIVES" &>/dev/null;fi
 if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null;fi
 
 export TMP OUTPUT XORG_PREFIX
+
+scriptLog ()
+{
+	local timestr
+	if [ $SCRIPTLOG -eq 1 ];then
+		if [ -e /bin/date ];then
+			timestr="$(date +"@%H:%M:%S")"
+		else
+			timestr=""
+		fi
+		mkdir -p $(dirname "$1") &>/dev/null||true
+		exec > >(tee -ia "${1}${timestr}.log")
+	fi
+}
 
 log ()
 {
