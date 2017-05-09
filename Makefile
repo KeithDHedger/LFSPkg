@@ -9,8 +9,12 @@ FUNCTIONS="LFSFunctions"
 MANPAGE="${PROGRAM}.1"
 RCFILE="lfspkg.rc"
 
+
+all:
+	g++ -o $(HELPER) $(HELPERCODE)
+
 clean:
-	rm $(HELPER)
+	rm $(HELPER)||true
 
 install:
 	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)/etc $(DESTDIR)$(PREFIX)/share/man/man1||true

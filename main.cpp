@@ -404,7 +404,10 @@ void listDepends(char* depstr)
 					dependsList[numDepends].version=strdup(wantversion);
 					dependsList[numDepends].scriptPath=scripts[scriptnum].scriptPath;
 					if(quiet==false)
-						fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
+						{
+							//fprintf(stderr,BLUE "Found dependency " NORMAL);
+							fprintf(stdout,BLUE "Found dependency " NORMAL "%s\n",strippedstring);
+						}
 
 					if(scripts[scriptnum].installed==true)
 						{

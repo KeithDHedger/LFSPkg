@@ -1,0 +1,12 @@
+PROGRAM=lfspkg
+PREFIX=/usr
+VERSION=0.4.19
+CONF=LFSMakePkg.conf
+HELPER=finddepends
+HELPERCODE=main.cpp
+
+all:
+	rm -f  
+	sed -r -i 's/[0-9]+.[0-9]+.[0-9]+/'"$(VERSION)"'/' $(CONF)
+	makeswitch -c $(CONF)
+	g++ -o $(HELPER) $(HELPERCODE)
