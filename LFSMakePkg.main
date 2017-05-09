@@ -43,6 +43,7 @@ init ()
 	DATABASEFOLDER=${LFSPKGFOLDER}/database
 	DATABASE=${DATABASEFOLDER}/db.txt
 	SIMPLEUPDATE=${SIMPLEUPDATE:-0}
+	RETURNCODE=0
 	mkdir -vp "$PKGFOLDER" "$DATABASEFOLDER" ||true
 	export ROOTDIR
 }
@@ -694,7 +695,6 @@ main ()
 		return
 	fi
 
-
 	if [ $SEARCH -eq 1 ];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
@@ -724,6 +724,11 @@ main ()
 				done
 			echo
 		done
+	if [ ${#found[@]} -eq 0 ];then
+		RETURNCODE=1
+	fi
+	
+	return $RETURNCODE
 } 
 
 checkforoot ()
@@ -745,5 +750,5 @@ if [ $NOASKROOT -eq 0 ];then
 fi
 main
 rm $ANSWER &>/dev/null
-exit 0
+exit $RETURNCODE
 
