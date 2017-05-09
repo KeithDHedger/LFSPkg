@@ -364,6 +364,8 @@ BUILD=1
 SECTION="$upperdir"
 SUFFIX="LFSPKG"
 TARBALL="\${TARNAME}-\${VERSION}${suffix}"
+
+scriptLog "\${PKGNAME}-\${VERSION}"
 gettar "${pkgdir}/\${TARBALL}" \$SECTION
 
 PKG="\${OUTPUT}/\${PKGNAME}"
