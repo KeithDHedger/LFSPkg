@@ -596,11 +596,11 @@ checkforversion ()
 							fi
 							infodata=$(cat ${appname}.html|grep -i "\b$appname\b"|head -n1)							
 							vers=${infodata##?*-}
-							infodata=$(sed -n "/name=\b${appname}\b/I,/Installed version=/p" "${DATABASE}")
+							infodata=$(sed -n "/name=${appname}$/I,/Installed version=/p" "${DATABASE}")
 							packageversion=$(echo "$infodata"|sed -n '2p'|awk -F= '{print $2}')
 							printversioninfo $vers $packageversion $appname "$infodata"
 							continue 2
-						fi
+					fi
 					done
 				echo -e "${RED}No version info for $appname found ...${NORMAL}" 1>&2
 			done

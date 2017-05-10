@@ -236,6 +236,11 @@ removelfspkg ()
 			done
 		rm "${PKGFOLDER}/${pkgfolder}/"*
 		rmdir "${PKGFOLDER}/${pkgfolder}"
+		echo -e "${RED}Un-Installing $pkgname ...${NORMAL}\n" >&2
+		oldsimple=$SIMPLEUPDATE
+		SIMPLEUPDATE=1
+		updatedatabase
+		SIMPLEUPDATE=$oldsimple
 	else
 		exit 0
 	fi
