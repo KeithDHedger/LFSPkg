@@ -406,7 +406,8 @@ void listDepends(char* depstr)
 					if(quiet==false)
 						{
 							//fprintf(stderr,BLUE "Found dependency " NORMAL);
-							fprintf(stdout,BLUE "Found dependency " NORMAL "%s\n",strippedstring);
+							//fprintf(stdout,BLUE "Found dependency " NORMAL "%s\n",strippedstring);
+							fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
 						}
 
 					if(scripts[scriptnum].installed==true)

@@ -246,6 +246,7 @@ doinstall ()
 	local pkgpath="$1"
 	local pkgname
 	local callingfolder
+	local oldsimple
 
 	pkgfolder="$(basename "${pkgpath%-?*}")"
 	pkgname="$(basename "${pkgpath/.tar.gz/}")"
@@ -280,6 +281,11 @@ doinstall ()
 			mv $ROOTDIR/postinstall . &>/dev/null||true
 			mv $ROOTDIR/info . &>/dev/null||true
 		popd
+		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
+		oldsimple=$SIMPLEUPDATE
+		SIMPLEUPDATE=1
+		updatedatabase
+		SIMPLEUPDATE=$oldsimple
 	popd
 }
 
@@ -499,7 +505,6 @@ builddeps()
 				echo -e "${RED}ABORTING !!!${NORMAL}"
 				exit 100
 			fi
-
 			pushd "$(dirname "$SCRIPT")"
 				savestdin
 					what=${SCRIPT##?* }
