@@ -55,7 +55,7 @@ scriptLog ()
 	local timestr
 	if [ $SCRIPTLOG -eq 1 ];then
 		if [ -e /bin/date ];then
-			timestr="$(date +"@%H:%M:%S")"
+			timestr="$(date +"-%H:%M:%S")"
 		else
 			timestr=""
 		fi
