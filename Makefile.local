@@ -18,3 +18,7 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/share/LFSPkg $(DESTDIR)$(PREFIX)/bin||true
 	cp $(FUNCTIONS) $(DESTDIR)$(PREFIX)/share/LFSPkg/
 	cp $(PROGRAM) $(HELPER) $(DESTDIR)$(PREFIX)/bin
+
+clean:
+	rm $(PROGRAM) $(HELPER) || true
+
