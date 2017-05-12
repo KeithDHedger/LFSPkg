@@ -505,21 +505,23 @@ builddeps()
 
 	while read SCRIPT
 		do
-			if [ "X${SCRIPT:7:5}" = "XERROR" ];then
-				echo $SCRIPT
-				echo -e "${RED}ABORTING !!!${NORMAL}"
-				exit 100
+			if [ "X$SCRIPT" != "X" ];then
+				if [ "X${SCRIPT:7:5}" = "XERROR" ];then
+					echo $SCRIPT
+					echo -e "${RED}ABORTING !!!${NORMAL}"
+					exit 100
+				fi
+				pushd "$(dirname "$SCRIPT")"
+					savestdin
+						what=${SCRIPT##?* }
+						if ! NODEPS=true ./$(basename $SCRIPT) $what;then
+							echo -e "${RED}Build error with $SCRIPT...${NORMAL}"
+							restorestdin
+							exit -1
+						fi
+					restorestdin
+				popd
 			fi
-			pushd "$(dirname "$SCRIPT")"
-				savestdin
-					what=${SCRIPT##?* }
-					if ! NODEPS=true ./$(basename $SCRIPT) $what;then
-						echo -e "${RED}Build error with $SCRIPT...${NORMAL}"
-						restorestdin
-						exit -1
-					fi
-				restorestdin
-			popd
 		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ B "$BUILDDEPS")
 }
 
@@ -549,24 +551,19 @@ updatedatabase ()
 finddependants ()
 {
 	local dep="$1"
-	local totallines
 	local name
-	local doesdepend
 	local version
 	local pathtoscript
+	local matches
 
-	totallines=$(wc -l /var/lib/lfspkg/database/db.txt|awk '{print $1}')
-	echo "Dependencies for ${dep}:"
-	for((j=1;j<totallines;j=j+7))
+	readarray matches < <(grep -sni "\b${dep}\b-[0-9].*" "$DATABASE"|awk -F ':' '{print $1}')
+	echo -e "${BLUE}Dependencies for ${GREEN}${dep}${NORMAL}:" >&2
+	for j in ${matches[@]}
 		do
-#			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b")
-			doesdepend=$(sed -n "$((j+4))p" "$DATABASE"|grep -i "\b${dep}\b-[0-9].*")
-			if [ X"$doesdepend" != "X" ];then
-				name=$(sed -n "$((j+1))p" "$DATABASE"|awk -F= '{print $2}')
-				version=$(sed -n "$((j+2))p" "$DATABASE"|awk -F= '{print $2}')
-				pathtoscript=$(sed -n "$((j+3))p" "$DATABASE"|awk -F= '{print $2}')
-				echo "${name}-${version} - ${ROOTDIR}$pathtoscript"
-			fi
+			name=$(sed -n "$((j-3))p" "$DATABASE"|awk -F= '{print $2}')
+			version=$(sed -n "$((j-2))p" "$DATABASE"|awk -F= '{print $2}')
+			pathtoscript=$(sed -n "$((j-1))p" "$DATABASE"|awk -F= '{print $2}')
+			echo "${name}-${version} - ${ROOTDIR}$pathtoscript"
 		done
 }
 

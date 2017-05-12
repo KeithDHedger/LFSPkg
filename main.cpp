@@ -30,6 +30,8 @@
 
 #define	DELAY	75
 
+enum {NONL=0,NLONERR,NLONOUT,NLONBOTH,CRONBOTH};
+
 struct dependsStruct
 {
 	char*		scriptPath;
@@ -58,11 +60,39 @@ char*			rootFolder=NULL;
 char*			libFolder=NULL;
 
 int				numDepends=0;
+//const char		*spinner[4]={"-\\|/"};
 const char*		spinner="-\\|/";
+
 int				spincnt=0;
 int				spindelay=0;
 
 bool			quiet=false;
+
+void printOut(const char* serr,const char* sout,int newlinewhere)
+{
+	if(serr!=NULL)
+		fprintf(stderr,"%s",serr);
+	if(sout!=NULL)
+		fprintf(stdout,"%s",sout);
+
+	switch(newlinewhere)
+		{
+			case NLONERR:
+				fprintf(stderr,"\n");
+				break;
+			case NLONOUT:
+				fprintf(stdout,"\n");
+				break;
+			case NLONBOTH:
+				fprintf(stdout,"\n");
+				fprintf(stderr,"\n");
+				break;
+			case CRONBOTH:
+				fprintf(stdout,"\r");
+				fprintf(stderr,"\r");
+				break;
+		}
+}
 
 char* getDependsFromData(char* data)
 {
@@ -154,7 +184,10 @@ void getData(void)
 			dataread=read(fd,&line[0],2047);
 			if(dataread==-1)
 				{
-					fprintf(stdout,RED "ERROR " NORMAL "Can't read any data from %s\n",scripts[numScripts].scriptPath);
+					//fprintf(stdout,RED "ERROR " NORMAL "Can't read any data from %s\n",scripts[numScripts].scriptPath);
+					//fprintf(stderr,RED "ERROR " NORMAL "Can't read any data from ");
+					//fprintf(stdout,"%s\n",scripts[numScripts].scriptPath);
+					printOut(RED "ERROR " NORMAL "Can't read any data from ",scripts[numScripts].scriptPath,NLONOUT);
 					close(fd);
 					exit(200);
 				}
@@ -168,7 +201,8 @@ void getData(void)
 		}
 	else
 		{
-			fprintf(stdout,RED "ERROR " NORMAL "Can't open file %s\n",scripts[numScripts].scriptPath);
+			//fprintf(stdout,RED "ERROR " NORMAL "Can't open file %s\n",scripts[numScripts].scriptPath);
+			printOut(RED "ERROR " NORMAL "Can't open file ",scripts[numScripts].scriptPath,NLONOUT);
 			exit(200);
 		}
 	free(scriptpath);
@@ -176,10 +210,11 @@ void getData(void)
 
 void getScripts(void)
 {
-	char*	command;
-	char	line[1024];
-	FILE*	fp;
-	char	*sf=NULL;
+	char		*command;
+	char		line[1024];
+	FILE		*fp;
+	char		*sf=NULL;
+//	const char	*spinnum[2]={0,};
 
 	asprintf(&command,"find %s%s -mindepth 3 -maxdepth 3 -iname \"*.LFSBuild\"|sort",rootFolder,scriptsFolder);
 	fp=popen(command,"r");
@@ -191,6 +226,10 @@ void getScripts(void)
 			numScripts++;
 
 			fprintf(stderr,GREEN "Locating scripts " NORMAL "%c\r",spinner[spincnt]);
+//			spinnum[0]=spinner[spincnt];
+//			char *ls[256]={0,};
+//			sprintf(ls,GREEN "Locating scripts %c\r" NORMAL,spinner[spincnt]);
+//			printOut(GREEN "Locating scripts " NORMAL,(const char*)spinnum,CRONBOTH);
 			spindelay++;
 			if(spindelay>DELAY)
 				{
@@ -202,6 +241,7 @@ void getScripts(void)
 		}
 	pclose(fp);
 	free(command);
+	printf("\n");
 }
 
 int getScriptStructFromName(char* name)
@@ -360,12 +400,17 @@ void listDepends(char* depstr)
 		{
 			strippedstring=chompedStr(holdstr);
 			dash=strrchr(strippedstring,'-');
-			wantname=strndup(strippedstring,(long)dash-(long)strippedstring);
 
-			if(dash!=NULL)
-				wantversion=strdup(&dash[1]);
+			if((dash!=NULL) && (isdigit(dash[1])==true))
+				{
+					wantversion=strdup(&dash[1]);
+					wantname=strndup(strippedstring,(long)dash-(long)strippedstring);
+				}
 			else
-				wantversion=strdup("0");
+				{
+					wantname=strdup(strippedstring);
+					wantversion=strdup("0");
+				}
 
 			gotit=false;
 			for(int j=0; j<numDepends; j++)
@@ -384,7 +429,8 @@ void listDepends(char* depstr)
 						return;
 					if(scriptnum==-1)
 						{
-							fprintf(stdout,RED "ERROR " NORMAL "No available build script for %s\n" NORMAL,strippedstring);
+							fprintf(stderr,"\r" RED "ERROR " NORMAL "No available build script for %s\n" NORMAL,strippedstring);
+							//(RED "ERROR " NORMAL "No available build script for " NORMAL,strippedstring,NLONOUT);
 							exit(400);
 						}
 					else
@@ -407,7 +453,8 @@ void listDepends(char* depstr)
 						{
 							//fprintf(stderr,BLUE "Found dependency " NORMAL);
 							//fprintf(stdout,BLUE "Found dependency " NORMAL "%s\n",strippedstring);
-							fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
+							//fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
+							printOut(BLUE "\rFound dependency " NORMAL,strippedstring,NLONOUT);
 						}
 
 					if(scripts[scriptnum].installed==true)
@@ -421,7 +468,11 @@ void listDepends(char* depstr)
 									asprintf(&dependsList[numDepends].doWhat,"%s upgrade",dependsList[numDepends].scriptPath);
 									break;
 								case -1:
-									fprintf(stdout,RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
+									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+									//printOut(RED "ERROR " NORMAL "Version of build script " GREEN,dependsList[numDepends].scriptPath,NONL);
+									//printOut(NULL,NORMAL " is to low for dependency " BLUE,NONL);
+									//printOut(NULL,strippedstring,NLONOUT);
+									//printOut(NULL,
 									exit(100);
 									break;
 								}
@@ -434,7 +485,14 @@ void listDepends(char* depstr)
 								}
 							else
 								{
-									fprintf(stdout,RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
+									//fprintf(stdout,RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
+//									printOut(RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
+//									printOut(RED "ERROR " NORMAL "Version of build script " GREEN,dependsList[numDepends].scriptPath,NONL);
+//									printOut(NULL," is to low for dependency " BLUE,NONL);
+//									printOut(NULL,strippedstring,NLONOUT);
+									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+
+
 									exit(200);
 								}
 						}
@@ -502,6 +560,7 @@ int main(int argc, char **argv)
 			break;
 
 		case 'B':
+			quiet=true;
 			listDepends(correctedArgv);
 			for(int j=0; j<numDepends; j++)
 				{
