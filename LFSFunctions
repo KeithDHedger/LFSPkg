@@ -426,7 +426,7 @@ makepkginfo ()
 				fi
 			done
 
-		for vers in "14.1" "14.0" "13.37" "13.1"
+		for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
 			do
 				echo -e "${GREEN}Checking Slackbuilds version $vers for Info ...${NORMAL}" 1>&2
 				subpage=$(grep -i "SLACKBUILD LOCATION:[ ]*\./[[:alnum:]]*/${appname}$" "${vers}.txt" 2>/dev/null)||true
@@ -494,7 +494,7 @@ showwebpage ()
 				fi
 			done
 
-		for vers in "14.1" "14.0" "13.37" "13.1"
+		for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
 			do
 				echo -e "${GREEN}Checking Slackbuilds version $vers for Info ...${NORMAL}" 1>&2
 				subpage=$(grep -i "SLACKBUILD LOCATION:[ ]*\./[[:alnum:]]*/${appname}$" "${vers}.txt" 2>/dev/null)||true
@@ -542,7 +542,7 @@ checkforversion ()
 		for packages in ${OPTS[@]}
 			do
 				appname=$packages
-				for usepage in "lfsstable" "blfsstable" "14.1" "14.0" "13.37" "13.1" "lfsdev" "blfsdev"
+				for usepage in "lfsstable" "blfsstable" "14.2" "14.1" "14.0" "13.37" "13.1" "lfsdev" "blfsdev"
 					do
 						case $usepage in
 							"lfsstable")

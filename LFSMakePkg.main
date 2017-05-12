@@ -536,7 +536,7 @@ updatedatabase ()
 			wget http://www.linuxfromscratch.org/lfs/view/stable/longindex.html -O lfsindex1.html
 			wget http://www.linuxfromscratch.org/blfs/view/svn/longindex.html -O blfsindex0.html
 			wget http://www.linuxfromscratch.org/lfs/view/development/longindex.html -O lfsindex0.html
-			for vers in "14.1" "14.0" "13.37" "13.1"
+			for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
 				do
 					echo -e "${GREEN}Getting index pages from Slackbuilds $vers ...${NORMAL}" 1>&2
 					wget -c http://slackbuilds.org/slackbuilds/${vers}/SLACKBUILDS.TXT.gz -O ${vers}.txt.gz
