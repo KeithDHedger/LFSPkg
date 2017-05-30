@@ -9,7 +9,6 @@ FUNCTIONS="LFSFunctions"
 MANPAGE="${PROGRAM}.1"
 RCFILE="lfspkg.rc"
 
-
 all:
 	g++ -o $(HELPER) $(HELPERCODE)
 
@@ -26,6 +25,8 @@ install:
 
 	@echo "**************************************************************"
 	@echo "Now set your package options in the file /etc/lfspkg.rc"
+	@echo "Or create the file ' ~/.lfspkg.rc' which will be sourced after '/etc/lfspkg.rc'"
+	@echo
 	@echo "See the manpage for details, but you should set at least:"
 	@echo "OUTPUT and SOURCEARCHIVES"
 	@echo

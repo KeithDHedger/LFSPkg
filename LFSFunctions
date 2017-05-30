@@ -37,6 +37,10 @@ if [ -e /etc/lfspkg.rc ];then
 	. /etc/lfspkg.rc
 fi
 
+if [ -e ~/.lfspkg.rc ];then
+	. ~/.lfspkg.rc
+fi
+
 TMP=${TMP:-/tmp/LFS}
 OUTPUT=${OUTPUT:-$TMP}
 XORG_PREFIX=${XORG_PREFIX:-/usr}
@@ -146,6 +150,16 @@ findnextpair ()
 	else
 		echo $uid
 	fi
+}
+
+findArchive ()
+{
+	local url="$1"
+	local name="$2"
+	local suffix="$3"
+
+	echo -e "${GREEN}Checking ...${NORMAL}" >&2
+	links -dump "$url"|grep "$name" |awk '{print $NF}'|grep "${suffix}$"|sort -r|head -n1
 }
 
 checkversion ()
