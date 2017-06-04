@@ -34,6 +34,10 @@ install:
 	@echo "https://github.com/KeithDHedger/LFSPkgBuilds"
 	@echo "Place LFSPkgBuildScripts and LFSScripts in / ."
 	@echo "If you place them elsewhere set BUILDSCRIPTS in /etc/lfspkg.rc"
+	@echo
+	@echo "After downloading the build scripts build the database like so:
+	@echo "lfspkg -U"
+	@echo
 	@echo "**************************************************************"
 
 uninstall:
