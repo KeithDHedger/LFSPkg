@@ -15,7 +15,7 @@ if [ "X$LOCAL" != "X" ];then
 	. ./LFSFunctions
 else
 	. /usr/share/LFSPkg/LFSFunctions
-	FINDHELPER=/usr/bin/finddepends)
+	FINDHELPER=/usr/bin/finddepends
 fi
 
 init ()

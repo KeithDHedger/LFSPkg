@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun  4 Jun 19:25:48 BST 2017
+#Sun  4 Jun 19:32:25 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -231,7 +231,7 @@ if [ "X$LOCAL" != "X" ];then
 	. ./LFSFunctions
 else
 	. /usr/share/LFSPkg/LFSFunctions
-	FINDHELPER=/usr/bin/finddepends)
+	FINDHELPER=/usr/bin/finddepends
 fi
 
 init ()
