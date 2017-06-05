@@ -289,7 +289,7 @@ doinstall ()
 		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
 		oldsimple=$SIMPLEUPDATE
 		SIMPLEUPDATE=1
-		updatedatabase
+		updatedatabase ||true
 		SIMPLEUPDATE=$oldsimple
 	popd
 }

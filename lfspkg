@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun  4 Jun 19:33:31 BST 2017
+#Mon  5 Jun 13:20:57 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -505,7 +505,7 @@ doinstall ()
 		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
 		oldsimple=$SIMPLEUPDATE
 		SIMPLEUPDATE=1
-		updatedatabase
+		updatedatabase ||true
 		SIMPLEUPDATE=$oldsimple
 	popd
 }
