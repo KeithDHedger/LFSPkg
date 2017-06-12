@@ -20,5 +20,5 @@ install:
 	cp $(PROGRAM) $(HELPER) $(DESTDIR)$(PREFIX)/bin
 
 clean:
-	rm $(PROGRAM) $(HELPER) || true
+	rm $(HELPER) || true
 
