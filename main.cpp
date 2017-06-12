@@ -1,9 +1,22 @@
 /*
-/
-/ lfspkg finddepends
-/
-/
-*/
+ *
+ * ©K. D. Hedger. Mon 12 Jun 12:02:04 BST 2017 kdhedger68713@gmail.com
+
+ * This file (main.cpp) is part of LFSMakePkg.
+
+ * Projects is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * at your option) any later version.
+
+ * Projects is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with LFSMakePkg.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -60,13 +73,59 @@ char*			rootFolder=NULL;
 char*			libFolder=NULL;
 
 int				numDepends=0;
-//const char		*spinner[4]={"-\\|/"};
 const char*		spinner="-\\|/";
 
 int				spincnt=0;
 int				spindelay=0;
 
 bool			quiet=false;
+char			*strBuffer[PATH_MAX]={0,};
+char			*pBuffer=(char*)&strBuffer;
+
+char* cleanFolderPath(const char* path)
+{
+#if 1
+	char		tpath[PATH_MAX]={0,};
+	char		*cleanpath;
+	bool		lastwasslash=false;
+	unsigned	topos=0;
+
+	for(int j=0;j<strlen(path);j++)
+		{
+			if(path[j]!='/')
+				{
+					tpath[topos]=path[j];
+					topos++;
+					lastwasslash=false;
+				}
+			else
+				{
+					if(lastwasslash==false)
+						{
+							tpath[topos]=path[j];
+							topos++;
+							lastwasslash=true;
+						}
+				}
+		}
+
+	if(tpath[topos-1]!='/')
+		tpath[topos++]='/';
+
+	tpath[topos]=0;
+	return(strdup((char*)tpath));
+#else
+	char		*tpath[PATH_MAX]={0,};
+	char		*cleanpath;
+
+	realpath(path,(char*)tpath);
+	if(strlen((char*)tpath)==1)
+		asprintf(&cleanpath,"/");
+	else
+		asprintf(&cleanpath,"%s/",tpath);
+	return(cleanpath);
+#endif
+}
 
 void printOut(const char* serr,const char* sout,int newlinewhere)
 {
@@ -177,16 +236,12 @@ void getData(void)
 	char	*scriptpath=NULL;
 
 	asprintf(&scriptpath,"%s%s",rootFolder,scripts[numScripts].scriptPath);
-//	fd=open(scripts[numScripts].scriptPath,O_RDONLY);
 	fd=open(scriptpath,O_RDONLY);
 	if(fd!=-1)
 		{
 			dataread=read(fd,&line[0],2047);
 			if(dataread==-1)
 				{
-					//fprintf(stdout,RED "ERROR " NORMAL "Can't read any data from %s\n",scripts[numScripts].scriptPath);
-					//fprintf(stderr,RED "ERROR " NORMAL "Can't read any data from ");
-					//fprintf(stdout,"%s\n",scripts[numScripts].scriptPath);
 					printOut(RED "ERROR " NORMAL "Can't read any data from ",scripts[numScripts].scriptPath,NLONOUT);
 					close(fd);
 					exit(200);
@@ -201,7 +256,6 @@ void getData(void)
 		}
 	else
 		{
-			//fprintf(stdout,RED "ERROR " NORMAL "Can't open file %s\n",scripts[numScripts].scriptPath);
 			printOut(RED "ERROR " NORMAL "Can't open file ",scripts[numScripts].scriptPath,NLONOUT);
 			exit(200);
 		}
@@ -214,22 +268,22 @@ void getScripts(void)
 	char		line[1024];
 	FILE		*fp;
 	char		*sf=NULL;
-//	const char	*spinnum[2]={0,};
+	unsigned	offset=0;
 
-	asprintf(&command,"find %s%s -mindepth 3 -maxdepth 3 -iname \"*.LFSBuild\"|sort",rootFolder,scriptsFolder);
+	if(strlen(rootFolder)>1)
+		offset=strlen(rootFolder)-1;
+
+	asprintf(&command,"find %s -mindepth 3 -maxdepth 3 -iname \"*.LFSBuild\" |sort",scriptsFolder);
 	fp=popen(command,"r");
 	while(fgets(line,1024,fp)!=NULL)
 		{
-			scripts[numScripts].scriptPath=strndup((char*)&line[strlen(rootFolder)],strlen(line)-1-strlen(rootFolder));
+			line[strlen(line)-1]=0;
+			scripts[numScripts].scriptPath=strdup(&line[offset]);
 			scripts[numScripts].checked=false;
 			getData();
 			numScripts++;
 
 			fprintf(stderr,GREEN "Locating scripts " NORMAL "%c\r",spinner[spincnt]);
-//			spinnum[0]=spinner[spincnt];
-//			char *ls[256]={0,};
-//			sprintf(ls,GREEN "Locating scripts %c\r" NORMAL,spinner[spincnt]);
-//			printOut(GREEN "Locating scripts " NORMAL,(const char*)spinnum,CRONBOTH);
 			spindelay++;
 			if(spindelay>DELAY)
 				{
@@ -430,7 +484,6 @@ void listDepends(char* depstr)
 					if(scriptnum==-1)
 						{
 							fprintf(stderr,"\r" RED "ERROR " NORMAL "No available build script for %s\n" NORMAL,strippedstring);
-							//(RED "ERROR " NORMAL "No available build script for " NORMAL,strippedstring,NLONOUT);
 							exit(400);
 						}
 					else
@@ -451,9 +504,6 @@ void listDepends(char* depstr)
 					dependsList[numDepends].scriptPath=scripts[scriptnum].scriptPath;
 					if(quiet==false)
 						{
-							//fprintf(stderr,BLUE "Found dependency " NORMAL);
-							//fprintf(stdout,BLUE "Found dependency " NORMAL "%s\n",strippedstring);
-							//fprintf(stderr,BLUE "\rFound dependency "  NORMAL "%s \n",strippedstring);
 							printOut(BLUE "\rFound dependency " NORMAL,strippedstring,NLONOUT);
 						}
 
@@ -469,10 +519,6 @@ void listDepends(char* depstr)
 									break;
 								case -1:
 									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
-									//printOut(RED "ERROR " NORMAL "Version of build script " GREEN,dependsList[numDepends].scriptPath,NONL);
-									//printOut(NULL,NORMAL " is to low for dependency " BLUE,NONL);
-									//printOut(NULL,strippedstring,NLONOUT);
-									//printOut(NULL,
 									exit(100);
 									break;
 								}
@@ -485,18 +531,10 @@ void listDepends(char* depstr)
 								}
 							else
 								{
-									//fprintf(stdout,RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
-//									printOut(RED "ERROR " NORMAL "Version of build script %s is to low for dependency " BLUE "%s\n",dependsList[numDepends].scriptPath,strippedstring);
-//									printOut(RED "ERROR " NORMAL "Version of build script " GREEN,dependsList[numDepends].scriptPath,NONL);
-//									printOut(NULL," is to low for dependency " BLUE,NONL);
-//									printOut(NULL,strippedstring,NLONOUT);
 									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
-
-
 									exit(200);
 								}
 						}
-
 					numDepends++;
 				}
 
@@ -513,11 +551,10 @@ void listDepends(char* depstr)
 //argv[2]#rootfolder
 //argv[3]=what to do
 //argv[4..n]=getdeps
-
-
 int main(int argc, char **argv)
 {
-	char* correctedArgv;
+	char	*correctedArgv;
+	char	*tstr[PATH_MAX];
 
 	if((argv[whatToDo][0]!='I') && (argv[whatToDo][0]!='L') && (argv[whatToDo][0]!='U'))
 		{
@@ -534,11 +571,18 @@ int main(int argc, char **argv)
 				}
 		}
 
-	scriptsFolder=argv[scriptsArg];
-	rootFolder=argv[rootArg];
+	pBuffer=(char*)strBuffer;
 
-//	asprintf(&scriptsFolder,"%s%s",rootFolder,argv[scriptsArg]);
-	asprintf(&libFolder,"%s/var/lib/lfspkg/packages",rootFolder);
+	rootFolder=cleanFolderPath(argv[rootArg]);
+	sprintf(pBuffer,"%s/var/lib/lfspkg/packages",rootFolder);
+	libFolder=cleanFolderPath(pBuffer);
+	sprintf(pBuffer,"%s%s",rootFolder,argv[scriptsArg]);
+	scriptsFolder=cleanFolderPath(pBuffer);
+
+//printf("rootFolder=%s\n",rootFolder);
+//printf("libFolder=%s\n",libFolder);
+//printf("scriptsFolder=%s\n",scriptsFolder);
+//exit(0);
 	getScripts();
 
 	switch(argv[whatToDo][0])
@@ -656,6 +700,9 @@ int main(int argc, char **argv)
 				}
 			break;
 		}
+	free(rootFolder);
+	free(libFolder);
+	free(scriptsFolder);
 }
 
 

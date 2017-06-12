@@ -18,6 +18,32 @@ else
 	FINDHELPER=/usr/bin/finddepends
 fi
 
+cleanFolderPath ()
+{
+	local path="$1"
+	local cleanpath=""
+	local lastwasslash=false
+
+	for ((arg=0;arg<${#path};arg++))
+		do
+			if [ ${path:$arg:1} != "/" ];then
+				cleanpath="${cleanpath}${path:$arg:1}"
+				lastwasslash=false
+			else
+				if [ $lastwasslash = false ];then
+					cleanpath="${cleanpath}/"
+					lastwasslash=true
+				fi
+			fi
+		done
+
+	if [ ${cleanpath:${#cleanpath}-1:1} = "/" ];then
+		echo "$cleanpath"
+	else
+		echo "${cleanpath}/"
+	fi
+}
+
 init ()
 {
 	TMP=${TMP:-/tmp}
@@ -38,14 +64,17 @@ init ()
 	SELECTEDPKG=""
 	CURRENTSTDINSAVE=2
 	USESTABLE=${USESTABLE:-1}
-	LFSPKGFOLDER=${ROOTDIR}/var/lib/lfspkg
+	LFSPKGFOLDER=${ROOTDIR}var/lib/lfspkg
 	PKGFOLDER=${LFSPKGFOLDER}/packages
 	DATABASEFOLDER=${LFSPKGFOLDER}/database
 	DATABASE=${DATABASEFOLDER}/db.txt
-	SIMPLEUPDATE=${SIMPLEUPDATE:-0}
+	SIMPLEUPDATE=${SIMPLEUPDATE:-1}
 	RETURNCODE=0
 	mkdir -vp "$PKGFOLDER" "$DATABASEFOLDER" ||true
-	export ROOTDIR
+	ROOTDIR=$(cleanFolderPath $ROOTDIR)
+	BUILDSCRIPTS=$(cleanFolderPath $BUILDSCRIPTS)
+
+	export ROOTDIR BUILDSCRIPTS
 }
 
 savestdin ()
@@ -74,8 +103,8 @@ reruninstallscripts ()
 
 	folder=${1%-?*}
 	if [ -e ${PKGFOLDER}/${folder}/${scriptname} ];then
-		cp ${PKGFOLDER}/${folder}/${scriptname} ${ROOTDIR}/
-		pushd ${ROOTDIR}/
+		cp ${PKGFOLDER}/${folder}/${scriptname} ${ROOTDIR}
+		pushd ${ROOTDIR}
 			./$scriptname
 			rm ./$scriptname||true
 		popd
@@ -456,11 +485,11 @@ remakepkg ()
 	folder=${SELECTEDPKG%-?*}
 
 	if [ -e ${PKGFOLDER}/${folder}/preinstall ];then
-		cp ${PKGFOLDER}/${folder}/preinstall ${ROOTDIR}/preinstall
+		cp ${PKGFOLDER}/${folder}/preinstall ${ROOTDIR}preinstall
 	fi
 
 	if [ -e ${PKGFOLDER}/${folder}/postinstall ];then
-		cp ${PKGFOLDER}/${folder}/postinstall ${ROOTDIR}/postinstall
+		cp ${PKGFOLDER}/${folder}/postinstall ${ROOTDIR}postinstall
 	fi
 
 	while read
@@ -488,12 +517,12 @@ remakepkg ()
 	popd
 
 	rm -rf "$buildtmp"
-	if [ -e ${ROOTDIR}/preinstall ];then
-		rm ${ROOTDIR}/preinstall
+	if [ -e ${ROOTDIR}preinstall ];then
+		rm ${ROOTDIR}preinstall
 	fi
 
-	if [ -e ${ROOTDIR}/postinstall ];then
-		rm ${ROOTDIR}/postinstall
+	if [ -e ${ROOTDIR}postinstall ];then
+		rm ${ROOTDIR}postinstall
 	fi
 }
 
@@ -522,7 +551,7 @@ builddeps()
 					restorestdin
 				popd
 			fi
-		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ B "$BUILDDEPS")
+		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} B "$BUILDDEPS")
 }
 
 updatedatabase ()
@@ -563,7 +592,7 @@ finddependants ()
 			name=$(sed -n "$((j-3))p" "$DATABASE"|awk -F= '{print $2}')
 			version=$(sed -n "$((j-2))p" "$DATABASE"|awk -F= '{print $2}')
 			pathtoscript=$(sed -n "$((j-1))p" "$DATABASE"|awk -F= '{print $2}')
-			echo "${name}-${version} - ${ROOTDIR}$pathtoscript"
+			echo "${name}-${version} - $(cleanFolderPath "${ROOTDIR}$pathtoscript")"
 		done
 }
 
@@ -685,12 +714,12 @@ main ()
 	fi
 
 	if [ $NOTINSTALLED -eq 1 ];then
-		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ U
+		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} U
 		return
 	fi
 
 	if [ $INSTALLED -eq 1 ];then
-		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR}/ I
+		$FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} I
 		return
 	fi
 
