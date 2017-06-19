@@ -11,8 +11,8 @@ if [ X"$THISTTY" = "X" ];then
 fi
 
 if [ "X$LOCAL" != "X" ];then
-	FINDHELPER=./finddepends
-	. ./LFSFunctions
+	FINDHELPER=$(pwd)/finddepends
+	. $(pwd)/LFSFunctions
 else
 	. /usr/share/LFSPkg/LFSFunctions
 	FINDHELPER=/usr/bin/finddepends
@@ -64,7 +64,7 @@ init ()
 	SELECTEDPKG=""
 	CURRENTSTDINSAVE=2
 	USESTABLE=${USESTABLE:-1}
-	LFSPKGFOLDER=${ROOTDIR}var/lib/lfspkg
+	LFSPKGFOLDER=${ROOTDIR}/var/lib/lfspkg
 	PKGFOLDER=${LFSPKGFOLDER}/packages
 	DATABASEFOLDER=${LFSPKGFOLDER}/database
 	DATABASE=${DATABASEFOLDER}/db.txt

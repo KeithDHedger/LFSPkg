@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon 12 Jun 13:16:06 BST 2017
+#Mon 19 Jun 15:55:02 BST 2017
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -227,8 +227,8 @@ if [ X"$THISTTY" = "X" ];then
 fi
 
 if [ "X$LOCAL" != "X" ];then
-	FINDHELPER=./finddepends
-	. ./LFSFunctions
+	FINDHELPER=$(pwd)/finddepends
+	. $(pwd)/LFSFunctions
 else
 	. /usr/share/LFSPkg/LFSFunctions
 	FINDHELPER=/usr/bin/finddepends
@@ -280,7 +280,7 @@ init ()
 	SELECTEDPKG=""
 	CURRENTSTDINSAVE=2
 	USESTABLE=${USESTABLE:-1}
-	LFSPKGFOLDER=${ROOTDIR}var/lib/lfspkg
+	LFSPKGFOLDER=${ROOTDIR}/var/lib/lfspkg
 	PKGFOLDER=${LFSPKGFOLDER}/packages
 	DATABASEFOLDER=${LFSPKGFOLDER}/database
 	DATABASE=${DATABASEFOLDER}/db.txt
