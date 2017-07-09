@@ -1,11 +1,12 @@
 0.4.21
-Added Changelog!
-Added LFSPkgSetUp script
-Added -Q option to lfspkg to run setup scriptLog
-Adjusted makefiles.
-Removed installation of /etc/lfspkg.rc
-Example lfspkg.rc file now in /usr/share/LFSPkg
+Added defaults to LFSPkgSetUp script
 No longer include any rc file in /etc
+Example lfspkg.rc file now in /usr/share/LFSPkg
+Removed installation of /etc/lfspkg.rc
+Adjusted makefiles.
+Added -Q option to lfspkg to run setup scriptLog
+Added LFSPkgSetUp script
+Added Changelog!
 
 0.4.20
 ...

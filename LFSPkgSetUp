@@ -44,6 +44,23 @@ esac
 #set variables if possible
 if [ -e ~/.lfspkg.rc ];then
 	. ~/.lfspkg.rc
+else
+	LFSVERSION=8.0
+	BUILDSCRIPTS=/LFSPkgBuildScripts/
+	OUTPUT=LFSBuiltPackages/8.0
+	SOURCEARCHIVES=/LFSSourceArchives/8.0
+	COMPILEAT=/LFSBuiltPackages
+	SCRIPTLOG=1
+
+	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --enable-gtk-doc --disable-debug --disable-nls --disable-static"
+	CHECKETC=1
+	MAKEFLAGS=" -j$(nproc) "
+
+	XORG_PREFIX=/usr
+	XORG_CONFIG=--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static
+
+	JAVA_HOME=/opt/jdk
+	QT5PREFIX=/usr
 fi
 
 #LFS Version
