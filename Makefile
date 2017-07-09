@@ -17,7 +17,7 @@ clean:
 	rm $(HELPER)||true
 
 install:
-	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)/etc $(DESTDIR)$(PREFIX)/share/man/man1||true
+	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)$(PREFIX)/share/man/man1||true
 	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
@@ -25,7 +25,6 @@ install:
 
 	@echo "**************************************************************"
 	@echo "Now set your package options in the file ~/lfspkg.rc"
-	@echo "Either manually or by using 'lfspkg --setup'"
 	@echo "Either manually or by using 'lfspkg --setup'"
 	@echo "An example rc file is included in $(PREFIX)/share/$(PKGNAME)"
 	@echo 

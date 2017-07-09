@@ -2,4 +2,7 @@
 Added Changelog!
 Added LFSPkgSetUp script
 Added -Q option to lfspkg to run setup scriptLog
-
+Adjusted makefiles.
+Removed installation of /etc/lfspkg.rc
+Example lfspkg.rc file now in /usr/share/LFSPkg
+No longer include any rc file in /etc
