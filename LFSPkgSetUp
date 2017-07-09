@@ -133,7 +133,7 @@ if [ $SUMMARY = "n" ];then
 	exit 1
 fi
 
-cat > /tmp/lfspkg.rc << EOF
+cat > ~/.lfspkg.rc << EOF
 LFSVERSION=$LFSVERSION
 LIBDIRSUFFIX=$LIBDIRSUFFIX
 BUILDSCRIPTS="$BUILDSCRIPTS"
