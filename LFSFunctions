@@ -33,9 +33,9 @@ esac
 
 export LIBDIRSUFFIX LFSFLAGS
 
-if [ -e /etc/lfspkg.rc ];then
-	. /etc/lfspkg.rc
-fi
+#if [ -e /etc/lfspkg.rc ];then
+#	. /etc/lfspkg.rc
+#fi
 
 if [ -e ~/.lfspkg.rc ];then
 	. ~/.lfspkg.rc

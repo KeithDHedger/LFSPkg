@@ -13,9 +13,11 @@ fi
 if [ "X$LOCAL" != "X" ];then
 	FINDHELPER=$(pwd)/finddepends
 	. $(pwd)/LFSFunctions
+	LFSSETUP=$(pwd)/LFSPkgSetUp
 else
 	. /usr/share/LFSPkg/LFSFunctions
 	FINDHELPER=/usr/bin/finddepends
+	LFSSETUP=/usr/share/LFSPkg/LFSPkgSetUp
 fi
 
 cleanFolderPath ()
@@ -577,6 +579,11 @@ updatedatabase ()
 	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
 }
 
+setupLfspkgRCFile ()
+{
+	$LFSSETUP
+}
+
 finddependants ()
 {
 	local dep="$1"
@@ -599,6 +606,11 @@ finddependants ()
 main ()
 {
 	local defaultdata
+
+	if [ $SETUP -eq 1 ];then
+		setupLfspkgRCFile
+		return
+	fi
 
 	if [ $NOCOLOUR -eq 1 ];then
 		RED=""

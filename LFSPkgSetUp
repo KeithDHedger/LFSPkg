@@ -1,0 +1,177 @@
+#!/bin/bash -e
+
+#
+# ©K. D. Hedger. Mon 12 Jun 15:48:46 BST 2017 kdhedger68713@gmail.com
+#
+# This file (LFSSetUp) is part of BootCD.
+#
+# BootCD is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# at your option) any later version.
+
+# BootCD is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with BootCD.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#$1=varname $2=message
+readWithDefault ()
+{
+	local varname="$1"
+	local varcontents="${!varname}"
+	local message="$2"
+
+	read -e -p "$message [ ${varcontents} ] "
+	if [ "X$REPLY" != "X" ];then
+		eval "${varname}=$REPLY"
+	fi
+}
+
+case $(uname -m) in
+	x86_64)
+		LIBDIRSUFFIX=64
+		;;
+	*)
+		LIBDIRSUFFIX=""
+		;;
+esac
+
+#set variables if possible
+if [ -f ~/.lfspkg.rc ];then
+	. ~/.lfspkg.rc
+fi
+
+#LFS Version
+LFSVERSION=${LFSVERSION:-"8.0"}
+readWithDefault "LFSVERSION" "Enter Version"
+
+#libdir suffix
+readWithDefault "LIBDIRSUFFIX" "Enter Suffix For Lib Folders"
+
+#buildscripts location
+BUILDSCRIPTS="/LFSPkgBuildScripts/"
+readWithDefault "BUILDSCRIPTS" "Enter Folder For Build Scripts"
+
+#Folder for built pkgs
+OUTPUT=${OUTPUT:-"/LFSBuiltPackages/$LFSVERSION"}
+readWithDefault "OUTPUT"  "Enter Folder For Built Packages"
+
+#Place to store downloaded source archives, defaults to /LFSSourceArchives/${LFSVERSION}
+SOURCEARCHIVES=${SOURCEARCHIVES:-"/LFSSourceArchives/${LFSVERSION}"}
+readWithDefault "SOURCEARCHIVES" "Enter Folder For Source Archives"
+
+#compile at folder for large builds
+COMPILEAT=${COMPILEAT:-""}
+readWithDefault "COMPILEAT" "Compile In This Folder Instead Of In Pkg Folder"
+
+#general config options
+CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
+readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
+
+#check /etc/ for config file clashes
+CHECKETC=${CHECKETC:-1}
+readWithDefault "CHECKETC" "Check /etc For Possible Config File Clashes, 0 = No Check"
+
+#general purpose make flags
+MAKEFLAGS=${MAKEFLAGS:-" -j$(nproc) "}
+readWithDefault "MAKEFLAGS" "General Purpose Switches To Make"
+
+#xorg prefix
+XORG_PREFIX=${XORG_PREFIX:-"/usr"}
+oldprefix=$XORG_PREFIX
+readWithDefault "XORG_PREFIX" "Build Locattion For Xorg"
+
+#xorg configure options
+XORG_CONFIG=${XORG_CONFIG:-"--prefix=$XORG_PREFIX --sysconfdir=/etc --mandir=$XORG_PREFIX/share/man --localstatedir=/var --disable-static"}
+XORG_CONFIG=${XORG_CONFIG//$oldprefix/$XORG_PREFIX}
+readWithDefault "XORG_CONFIG" "Xorg Configure Options"
+
+#java home
+JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
+readWithDefault "JAVA_HOME" "Java Install Location"
+
+#qt5 and cmake stuff
+QT5DIR=/usr/lib64/qt5
+CMAKE_INSTALL_PREFIX=/usr
+CMAKE_PREFIX_PATH=$QT5DIR/cmake
+PATH="${QT5DIR}:${PATH}"
+
+DEFLIBSUFFIX=64
+DEFUSEQT5=TRUE
+DEFCMAKELINKERFLAGS='-L/usr/lib64/qt5'
+
+CMAKEINSTALLPREFIX="-DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX"
+CMAKEPREFIXPATH="-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
+CMAKELIBDIRSUFFIX="-DLIB_SUFFIX=$DEFLIBSUFFIX"
+CMAKEUSEQT5="-DUSE_QT5=$DEFUSEQT5"
+CMAKELDFLAGS="-DCMAKE_EXE_LINKER_FLAGS=$DEFCMAKELINKERFLAGS"
+
+export CMAKE_PREFIX_PATH
+export CMAKE_INSTALL_PREFIX
+export PATH
+export QT5DIR
+
+
+
+echo "----SUMMARY----"
+echo 
+echo "LFSVERSION=$LFSVERSION"
+
+echo "LIBDIRSUFFIX=$LIBDIRSUFFIX"
+echo "BUILDSCRIPTS=$BUILDSCRIPTS"
+echo "OUTPUT=$OUTPUT"
+echo "SOURCEARCHIVES=$SOURCEARCHIVES"
+echo "COMPILEAT=$COMPILEAT"
+echo
+echo "CONFIGOPTIONS=$CONFIGOPTIONS"
+echo "CHECKETC=$CHECKETC"
+echo "MAKEFLAGS=$MAKEFLAGS"
+echo
+echo "XORG_PREFIX=$XORG_PREFIX"
+echo "XORG_CONFIG=$XORG_CONFIG"
+echo
+echo "JAVA_HOME=$JAVA_HOME"
+
+echo "--------"
+
+exit 0
+SUMMARY="n"
+readWithDefault "SUMMARY"  "Write Config Files?"
+
+if [ $SUMMARY = "n" ];then
+	exit 1
+fi
+
+
+cat > ~/.lfspkg.rc << EOF
+
+LFS=$LFS
+LFSNAME=$LFSNAME
+LFSVERSION=$LFSVERSION
+KERNELVERSION=$KERNELVERSION
+INITTYPE=$INITTYPE
+
+LIBDIRSUFFIX=$LIBDIRSUFFIX
+BUILTPACKAGES=$BUILTPACKAGES
+SOURCEARCHIVES=$SOURCEARCHIVES
+EXTFOLDER=$EXTFOLDER
+BUILDSCRIPTS=$BUILDSCRIPTS
+
+KEYBOARD=$KEYBOARD
+ROOTFSTYPE=$ROOTFSTYPE
+ROOTDEV=$ROOTDEV
+SWAP=$SWAP
+
+LANGUAGE=$LANGUAGE
+
+IP=$IP
+GATEWAY=$GATEWAY
+SUBNET=$SUBNET
+NAMESERVERS="$NAMESERVERS"
+EOF
+

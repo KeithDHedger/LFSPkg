@@ -8,6 +8,7 @@ HELPERCODE="main.cpp"
 FUNCTIONS="LFSFunctions"
 MANPAGE="${PROGRAM}.1"
 RCFILE="lfspkg.rc"
+SETUP="LFSPkgSetUp"
 
 all:
 	g++ -o $(HELPER) $(HELPERCODE)
@@ -20,13 +21,14 @@ install:
 	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
-	cp $(RCFILE) $(DESTDIR)/etc
-	cp $(FUNCTIONS) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
+	cp $(FUNCTIONS) $(RCFILE) $(SETUP) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
 
 	@echo "**************************************************************"
-	@echo "Now set your package options in the file /etc/lfspkg.rc"
-	@echo "Or create the file ' ~/.lfspkg.rc' which will be sourced after '/etc/lfspkg.rc'"
-	@echo
+	@echo "Now set your package options in the file ~/lfspkg.rc"
+	@echo "Either manually or by using 'lfspkg --setup'"
+	@echo "Either manually or by using 'lfspkg --setup'"
+	@echo "An example rc file is included in $(PREFIX)/share/$(PKGNAME)"
+	@echo 
 	@echo "See the manpage for details, but you should set at least:"
 	@echo "OUTPUT and SOURCEARCHIVES"
 	@echo

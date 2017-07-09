@@ -31,3 +31,4 @@ export PATH
 export QT5DIR
 
 LFSVERSION=8.0
+COMPILEAT=
