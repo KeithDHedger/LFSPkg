@@ -429,7 +429,7 @@ EOF
 				cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 	mkdir build||true
 	cd  build
-	cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH ..
+	cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE ..
 	make \$MAKEFLAGS||make|| exit 1
 	make install DESTDIR=\$PKG || exit 1
 EOF
