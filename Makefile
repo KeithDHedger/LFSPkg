@@ -37,7 +37,7 @@ install:
 	@echo "If you place them elsewhere set BUILDSCRIPTS in /etc/lfspkg.rc"
 	@echo
 	@echo "After downloading the build scripts build the database like so:"
-	@echo "SIMPLEUPDATE=1 lfspkg -U"
+	@echo "SIMPLEUPDATE=0 lfspkg -U"
 	@echo
 	@echo "**************************************************************"
 
