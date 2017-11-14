@@ -1,4 +1,5 @@
 0.4.21
+Updating DB will now download index files as needed,setting SIMPLEUPDATE=0 will as before force download index files. 
 Minor changes to example rc file and template for cmake builds.
 Fixed minor bug in generated lfspkg.rc.
 Added defaults to LFSPkgSetUp script

@@ -429,7 +429,7 @@ EOF
 				cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 	mkdir build||true
 	cd  build
-	cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE ..
+	cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev ..
 	make \$MAKEFLAGS||make|| exit 1
 	make install DESTDIR=\$PKG || exit 1
 EOF
@@ -559,8 +559,8 @@ builddeps()
 updatedatabase ()
 {
 	mkdir -vp "$PKGFOLDER" "$DATABASEFOLDER" &>/dev/null||true
-	if [ $SIMPLEUPDATE -eq 0 ];then
-		pushd "${DATABASEFOLDER}" &>/dev/null
+	pushd "${DATABASEFOLDER}" &>/dev/null
+		if [ $SIMPLEUPDATE -eq 0 ];then
 			rm *.html *.gz *.info *-info *.txt||true
 			echo -e "${GREEN}Getting index pages from (B)LFS...${NORMAL}" 1>&2
 			wget http://www.linuxfromscratch.org/blfs/view/stable/longindex.html -O blfsindex1.html
@@ -574,8 +574,31 @@ updatedatabase ()
 					gunzip -c ${vers}.txt.gz > ${vers}.txt
 					rm ${vers}.txt.gz
 				done
-		popd &>/dev/null
-	fi
+		else
+			echo -e "${GREEN}Checking for index pages from (B)LFS...${NORMAL}" 1>&2
+			if [ ! -e blfsindex1.html ];then
+				wget http://www.linuxfromscratch.org/blfs/view/stable/longindex.html -O blfsindex1.html
+			fi
+			if [ ! -e lfsindex1.html ];then
+				wget http://www.linuxfromscratch.org/lfs/view/stable/longindex.html -O lfsindex1.html
+			fi
+			if [ ! -e blfsindex0.html ];then
+				wget http://www.linuxfromscratch.org/blfs/view/svn/longindex.html -O blfsindex0.html
+			fi
+			if [ ! -e lfsindex0.html ];then
+				wget http://www.linuxfromscratch.org/lfs/view/development/longindex.html -O lfsindex0.html
+			fi
+			for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
+				do
+					echo -e "${GREEN}Checking for index pages from Slackbuilds $vers ...${NORMAL}" 1>&2
+					if [ ! -e ${vers}.txt ];then
+						wget -c http://slackbuilds.org/slackbuilds/${vers}/SLACKBUILDS.TXT.gz -O ${vers}.txt.gz
+						gunzip -c ${vers}.txt.gz > ${vers}.txt
+						rm ${vers}.txt.gz
+					fi
+				done
+		fi
+	popd &>/dev/null
 	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
 }
 
