@@ -21,7 +21,8 @@ install:
 	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
-	cp $(FUNCTIONS) $(RCFILE) $(SETUP) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
+	cp $(FUNCTIONS) $(SETUP) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
+	cp $(RCFILE) $(DESTDIR)/etc
 
 	@echo "**************************************************************"
 	@echo "Now set your package options in the file ~/lfspkg.rc"

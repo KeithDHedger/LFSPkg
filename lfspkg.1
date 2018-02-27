@@ -1,4 +1,4 @@
-.TH "LFSPkg" "1" "0.4.0" "K.D.Hedger" ""
+.TH "LFSPkg" "1" "0.4.22" "K.D.Hedger" ""
 .SH "NAME"
 \fBlfspkg\fR - A package manager for Linux From Scratch
 .br
@@ -68,11 +68,6 @@ This is a source based package manager and dependencies can be checked for and b
 	Pipe output from list/find to less.
 .br
 
-\fB-N, --noaskroot\fR
-.br
-	Don't check for root user when using -i or -u switches.
-.br
-
 \fB-M, --remake\fR \fI[PACKAGE]\fR
 .br
 	Re-constitute an installed package \fI[PACKAGE]\fR.
@@ -101,6 +96,71 @@ This is a source based package manager and dependencies can be checked for and b
 \fB-A, --postinstall\fR \fI[PACKAGE]\fR
 .br
 	Re-run the postinstall script for \fI[PACKAGE]\fR.
+.br
+
+\fB-I, --info\fR \fI[PACKAGE]\fR
+.br
+	Try to make info file from lfs/blfs website.
+.br
+
+\fB-D, --pkginfo\fR \fI[PACKAGE]\fR
+.br
+	Print info for installed package \fI[PACKAGE]\fR.
+.br
+
+\fB-C, --check\fR \fI[PACKAGE]\fR
+.br
+	Try to check package version.
+.br
+
+\fB-U, --rebuild\fR
+.br
+	Re-build database.
+.br
+
+\fB-S, --search\fR \fB[PACKAGE\fR] \fB[DATANEEDED]\fR.
+.br
+	Search database DATANEEDED: 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version.
+.br
+
+\fB-T, --notinstalled\fR
+.br
+	List packages not installed.
+.br
+
+\fB-E, --installed\fR
+.br
+	List installed packages.
+.br
+
+\fB-O, --dependson\fR \fB[ARG]\fR
+.br
+	Find packages that depend on package ARG.
+.br
+
+\fB-P, --checkall\fR
+.br
+	Check all packages for possible upgrade.
+.br
+
+\fB-W, --webpage\fR \fB[PKG]\fR
+.br
+	Try to find and open webpage for PKG.
+.br
+
+\fB-K,--nocolour\fR
+.br
+	Use colour in output default=on.
+.br
+
+\fB-Q, --setup\fR
+.br
+	Setup lfspkg.rc file.
+.br
+
+\fB-N, --noaskroot\fR
+.br
+	Don't check for root user when using -i or -u switches.
 .br
 
 \fB-R, --rootdir\fR \fI[ROOTDIR]\fR

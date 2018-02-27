@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue 14 Nov 12:54:58 GMT 2017
+#Tue 27 Feb 13:27:48 GMT 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -16,7 +16,7 @@ lfspkgargs ()
 {
 
 APPNAME="lfspkg"
-VERSION="0.4.20"
+VERSION="0.4.22"
 
 COMMIT=0
 INSTALL=0
@@ -781,7 +781,7 @@ updatedatabase ()
 {
 	mkdir -vp "$PKGFOLDER" "$DATABASEFOLDER" &>/dev/null||true
 	pushd "${DATABASEFOLDER}" &>/dev/null
-	if [ $SIMPLEUPDATE -eq 0 ];then
+		if [ $SIMPLEUPDATE -eq 0 ];then
 			rm *.html *.gz *.info *-info *.txt||true
 			echo -e "${GREEN}Getting index pages from (B)LFS...${NORMAL}" 1>&2
 			wget http://www.linuxfromscratch.org/blfs/view/stable/longindex.html -O blfsindex1.html
@@ -795,7 +795,7 @@ updatedatabase ()
 					gunzip -c ${vers}.txt.gz > ${vers}.txt
 					rm ${vers}.txt.gz
 				done
-	else
+		else
 			echo -e "${GREEN}Checking for index pages from (B)LFS...${NORMAL}" 1>&2
 			if [ ! -e blfsindex1.html ];then
 				wget http://www.linuxfromscratch.org/blfs/view/stable/longindex.html -O blfsindex1.html
@@ -818,7 +818,7 @@ updatedatabase ()
 						rm ${vers}.txt.gz
 					fi
 				done
-	fi
+		fi
 	popd &>/dev/null
 	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
 }

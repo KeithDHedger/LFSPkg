@@ -1,3 +1,9 @@
+0.4.22
+Updated manpage.
+Functions file now tries to include .rc file from etc THEN local.
+Now copies default lfspkg.rc to /etc/ instead of /usr/share/LFSPkg.
+Extra options.
+
 0.4.21
 Updating DB will now download index files as needed,setting SIMPLEUPDATE=0 will as before force download index files. 
 Minor changes to example rc file and template for cmake builds.
