@@ -17,12 +17,12 @@ clean:
 	rm $(HELPER)||true
 
 install:
-	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)$(PREFIX)/share/man/man1||true
+	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)$(PREFIX)/share/man/man1 $(DESTDIR)/etc||true
 	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
 	cp $(FUNCTIONS) $(SETUP) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
-	cp $(RCFILE) $(DESTDIR)/etc
+	cp $(RCFILE) $(DESTDIR)/etc/$(RCFILE)
 
 	@echo "**************************************************************"
 	@echo "Now set your package options in the file ~/lfspkg.rc"
