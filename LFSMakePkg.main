@@ -775,14 +775,14 @@ main ()
 
 		if [ $OPTCOUNT -eq 1 ];then
 			defaultdata=0
-		else
-			defaultdata=${OPTS[1]}
-		fi
-
-		if [ $defaultdata -eq 0 ];then
 			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"
 		else
-			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${defaultdata}p"|awk -F= '{print $2}'
+			defaultdata=${OPTS[@]}
+			for((j=1;j<OPTCOUNT-1;j++))
+				do
+					sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s:",$2}'
+				done
+			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s",$2}'
 		fi
 		return
 	fi

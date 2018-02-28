@@ -1,4 +1,5 @@
 0.4.22
+Search option now accepts multiple args ( 1- 6 ) to print : seperated list.
 Updated manpage.
 Functions file now tries to include .rc file from etc THEN local.
 Now copies default lfspkg.rc to /etc/ instead of /usr/share/LFSPkg.
