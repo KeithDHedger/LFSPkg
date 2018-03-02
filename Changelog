@@ -1,4 +1,6 @@
 0.4.22
+Tweaked checketc function.
+ALlowed scripts to overide loading of .rc files in LFSFunction.
 Search option now accepts multiple args ( 1- 6 ) to print : seperated list.
 Updated manpage.
 Functions file now tries to include .rc file from etc THEN local.

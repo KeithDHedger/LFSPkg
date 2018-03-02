@@ -33,12 +33,14 @@ esac
 
 export LIBDIRSUFFIX LFSFLAGS
 
-if [ -e /etc/lfspkg.rc ];then
-	. /etc/lfspkg.rc
-fi
+if [ "X$NOLOADCONFIG" = "X" ];then
+	if [ -e /etc/lfspkg.rc ];then
+		. /etc/lfspkg.rc
+	fi
 
-if [ -e ~/.lfspkg.rc ];then
-	. ~/.lfspkg.rc
+	if [ -e ~/.lfspkg.rc ];then
+		. ~/.lfspkg.rc
+	fi
 fi
 
 TMP=${TMP:-/tmp/LFS}
@@ -228,12 +230,12 @@ checketc ()
 		return 0
 	else
 
-	if [ X"$THISTTY" = "X" ];then
-		export THISTTY=$(tty)
-	fi
-
-	exec 6<&0
-	exec 0<$THISTTY
+#	if [ X"$THISTTY" = "X" ];then
+#		export THISTTY=$(tty)
+#	fi
+#
+#	exec 6<&0
+#	exec 0<$THISTTY
 
 	while read ETCFILES
 		do
@@ -286,7 +288,7 @@ checketc ()
 		fi
 		return 0
 	fi
-	exec 0<&6 6<&-
+#	exec 0<&6 6<&-
 }
 
 gettar ()
