@@ -237,57 +237,57 @@ checketc ()
 #	exec 6<&0
 #	exec 0<$THISTTY
 
-	while read ETCFILES
-		do
-			from="$ETCFILES"
-			to="${ETCFILES#$PKG}"
-			if [ -e "$from" -a -e "$to" ];then
-				if ! diff -Bs "$from" "$to" &>/dev/null;then
-					testflag=true
-				fi
-			fi
-		done < <(find "${package}/etc" -type f)
-
-	if $testflag;then
-		echo "Possible config files have neen found!"
-		while $inputflag
+		while read ETCFILES
 			do
-				read -p "Do you want to (R)eplace new files with old,(I)gnore new files,(O)verwrite old files with new,(K)eep new files with .new suffix? " ANSWER
-				case $ANSWER in
-					I|i)
-						rm -rf "${package}/etc"
-						inputflag=false
-						;;
-					K|k)
-						while read ETCFILES
-							do
-								mv "$ETCFILES" "${ETCFILES}.new"||true
-								dest=$(dirname "${ETCFILES#$package}")
-								cp "${ETCFILES#$package}" "${package}${dest}"||true
-							done < <(find "${package}/etc" -type f)
-						inputflag=false
-						;;
-					O|o)
-						echo "All default config files for this package in /etc will be replaced with the default files!"
-						inputflag=false
-						;;
-					R|r)
-						while read ETCFILES
-							do
-								from="$ETCFILES"
-								to="${ETCFILES#$PKG}"
-								cp "$to" "$from"||true
-							done < <(find "${package}/etc" -type f)
-						inputflag=false
-						;;
-					*)
-						echo "Please enter I,K or O"
-						;;
-				esac
-			done
+				from="$ETCFILES"
+				to="${ETCFILES#$PKG}"
+				if [ -e "$from" -a -e "$to" ];then
+					if ! diff -Bs "$from" "$to" &>/dev/null;then
+						testflag=true
+					fi
+				fi
+			done < <(find "${package}/etc" -type f)
+
+		if $testflag;then
+			echo "Possible config files have neen found!"
+			while $inputflag
+				do
+					read -p "Do you want to (R)eplace new files with old,(I)gnore new files,(O)verwrite old files with new,(K)eep new files with .new suffix? " ANSWER
+					case $ANSWER in
+						I|i)
+							rm -rf "${package}/etc"
+							inputflag=false
+							;;
+						K|k)
+							while read ETCFILES
+								do
+									mv "$ETCFILES" "${ETCFILES}.new"||true
+									dest=$(dirname "${ETCFILES#$package}")
+									cp "${ETCFILES#$package}" "${package}${dest}"||true
+								done < <(find "${package}/etc" -type f)
+							inputflag=false
+							;;
+						O|o)
+							echo "All default config files for this package in /etc will be replaced with the default files!"
+							inputflag=false
+							;;
+						R|r)
+							while read ETCFILES
+								do
+									from="$ETCFILES"
+									to="${ETCFILES#$PKG}"
+									cp "$to" "$from"||true
+								done < <(find "${package}/etc" -type f)
+							inputflag=false
+							;;
+						*)
+							echo "Please enter I,K or O"
+							;;
+					esac
+				done
 		fi
-		return 0
 	fi
+	return 0
 #	exec 0<&6 6<&-
 }
 
