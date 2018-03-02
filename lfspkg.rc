@@ -1,5 +1,6 @@
-OUTPUT=${OUTPUT:-/tmp/LFS}
-SOURCEARCHIVES=${SOURCEARCHIVES:-/tmp/LFSSourceArchives}
+LFSVERSION=8.1
+OUTPUT=${OUTPUT:-/LFSBuiltPackages/${LFSVERSION}}
+SOURCEARCHIVES=${SOURCEARCHIVES:-/LFSSourceArchives}
 BUILDSCRIPTS=${BUILDSCRIPTS:-"/LFSPkgBuildScripts/"}
 EXITONFAIL=${EXITONFAIL:-1}
 CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --disable-nls --disable-static"}
@@ -31,5 +32,4 @@ export CMAKE_INSTALL_PREFIX
 export PATH
 export QT5DIR
 
-LFSVERSION=8.1
 COMPILEAT=
