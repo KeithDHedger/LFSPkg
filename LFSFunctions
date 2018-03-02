@@ -25,6 +25,12 @@ case "$ARCH" in
 		LFSFLAGS="-O2 -fPIC"
 		LIBDIRSUFFIX="64"
 		;;
+	"armv7l")
+		LFSFLAGS="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard"
+		LIBDIRSUFFIX=""
+	"armv6l")
+		LFSFLAGS="-O2 -march=armv6j -mfpu=vfp -mfloat-abi=hard"
+		LIBDIRSUFFIX=""
 	*)
 		LFSFLAGS="-O2"
 		LIBDIRSUFFIX=""
