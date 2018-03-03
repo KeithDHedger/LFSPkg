@@ -1,4 +1,5 @@
 0.4.22
+Fixed minor error text.
 Tweaked checketc function.
 ALlowed scripts to overide loading of .rc files in LFSFunction.
 Search option now accepts multiple args ( 1- 6 ) to print : seperated list.
