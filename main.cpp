@@ -484,7 +484,8 @@ void listDepends(char* depstr)
 					if(scriptnum==-1)
 						{
 							fprintf(stderr,"\r" RED "ERROR " NORMAL "No available build script for %s\n" NORMAL,strippedstring);
-							exit(400);
+							fprintf(stdout,"%s\n","ERROR");
+							exit(100);
 						}
 					else
 						{
@@ -519,6 +520,7 @@ void listDepends(char* depstr)
 									break;
 								case -1:
 									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL " is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+									fprintf(stdout,"%s\n","ERROR");
 									exit(100);
 									break;
 								}
@@ -532,6 +534,7 @@ void listDepends(char* depstr)
 							else
 								{
 									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+									fprintf(stdout,"%s\n","ERROR");
 									exit(200);
 								}
 						}

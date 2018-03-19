@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Wed 28 Feb 20:41:19 GMT 2018
+#Sun 18 Mar 17:23:18 GMT 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -757,6 +757,9 @@ builddeps()
 
 	while read SCRIPT
 		do
+			if [ "X$SCRIPT" = "XERROR" ];then
+				exit 100
+			fi
 			if [ "X$SCRIPT" != "X" ];then
 				if [ "X${SCRIPT:7:5}" = "XERROR" ];then
 					echo $SCRIPT
