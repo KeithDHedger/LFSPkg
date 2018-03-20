@@ -203,7 +203,7 @@ void checkInstalled(void)
 	char	line[1024];
 	FILE*	fp;
 	char*	dash;
-	char*	version;
+	char*	version=NULL;
 
 	asprintf(&command,"find %s -mindepth 2 -iname \"%s-[0-9]*\" 2>/dev/null",libFolder,scripts[numScripts].name);
 	fp=popen(command,"r");
@@ -315,12 +315,12 @@ int getScriptStructFromName(char* name)
 
 int checkversionnumber(char* v1,char* v2)
 {
-	double	realvers1;
-	double	realvers2;
-	char*	holdstr;
-	char*	saveptr;
-	double	mult;
-	int		result;
+	double	realvers1=0;
+	double	realvers2=0;
+	char*	holdstr=NULL;
+	char*	saveptr=NULL;
+	double	mult=0;
+	int		result=0;
 
 	holdstr=strdup(v1);
 	strtok_r(holdstr,".",&saveptr);
