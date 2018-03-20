@@ -86,7 +86,7 @@ char* cleanFolderPath(const char* path)
 {
 #if 1
 	char		tpath[PATH_MAX]={0,};
-	char		*cleanpath;
+	char		*cleanpath=NULL;
 	bool		lastwasslash=false;
 	unsigned	topos=0;
 
@@ -202,8 +202,8 @@ void checkInstalled(void)
 	char*	command;
 	char	line[1024];
 	FILE*	fp;
-	char*	dash;
-	char*	version=NULL;
+	char*	dash=NULL;
+	char*	version=0;
 
 	asprintf(&command,"find %s -mindepth 2 -iname \"%s-[0-9]*\" 2>/dev/null",libFolder,scripts[numScripts].name);
 	fp=popen(command,"r");
@@ -378,13 +378,13 @@ char* chompedStr(char* str)
 
 int multiCheck(char* want,char* installed,char* inscript)
 {
-	double	realvers1;
-	double	realvers2;
-	double	realvers3;
-	char*	holdstr;
-	char*	saveptr;
-	double	mult;
-	int		result;
+	double	realvers1=0;
+	double	realvers2=0;
+	double	realvers3=0;
+	char*	holdstr=NULL;
+	char*	saveptr=NULL;
+	double	mult=0;
+	int		result=0;
 
 	holdstr=strdup(want);
 	strtok_r(holdstr,".",&saveptr);
@@ -437,15 +437,15 @@ int multiCheck(char* want,char* installed,char* inscript)
 
 void listDepends(char* depstr)
 {
-	char*			holdstr;
+	char*			holdstr=NULL;
 	char*			wantname=NULL;
 	char*			wantversion=NULL;
 	char*			dash=NULL;
-	bool			gotit;
-	int				scriptnum;
-	char*			saveptr;
-	int				versres;
-	char*			strippedstring;
+	bool			gotit=false;
+	int				scriptnum=0;
+	char*			saveptr=NULL;
+	int				versres=0;
+	char*			strippedstring=NULL;
 
 	holdstr=strdup(depstr);
 	strtok_r(holdstr," ",&saveptr);
@@ -533,7 +533,7 @@ void listDepends(char* depstr)
 								}
 							else
 								{
-									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL "is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL " is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
 									fprintf(stdout,"%s\n","ERROR");
 									exit(200);
 								}

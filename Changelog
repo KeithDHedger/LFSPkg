@@ -1,4 +1,5 @@
 0.4.22
+Fixed some local vars not being inited.
 Fixed minor error text.
 Tweaked checketc function.
 ALlowed scripts to overide loading of .rc files in LFSFunction.
