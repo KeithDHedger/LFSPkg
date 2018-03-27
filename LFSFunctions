@@ -633,22 +633,23 @@ checkforversion ()
 
 packageclean ()
 {
-	local name="$1"
+	local pkgname="$1"
+	local scriptfolder="$2"
 
-	if [ -e ./preinstall ];then
-		cp ./preinstall "$name"
+	if [ -e "$scriptfolder/preinstall" ];then
+		cp "$scriptfolder/preinstall" "$pkgname"
 	fi
 
-	if [ -e ./postinstall ];then
-		cp ./postinstall "$name"
+	if [ -e "$scriptfolder/postinstall" ];then
+		cp "$scriptfolder/postinstall" "$pkgname"
 	fi
 
-	if [ -e ./info ];then
-		cp ./info "$name"
+	if [ -e "$scriptfolder/info" ];then
+		cp "$scriptfolder/info" "$pkgname"
 	fi
 
-	pushd "$name"
-		find "$name" -iname "*.la" -exec rm '{}' \;
+	pushd "$pkgname"
+		find "$pkgname" -iname "*.la" -exec rm '{}' \;
 		find | xargs file | grep -e "executable" -e "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 	popd
 	ldconfig||true
