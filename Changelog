@@ -1,4 +1,5 @@
 0.4.22
+Updated template creation.
 Fixed missing info, post/pre install files. 
 Fixed some local vars not being inited.
 Fixed minor error text.
