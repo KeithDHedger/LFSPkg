@@ -408,13 +408,12 @@ SUFFIX="LFSPKG"
 TARBALL="\${TARNAME}-\${VERSION}${suffix}"
 PKG="\${OUTPUT}/\${PKGNAME}"
 DOWHAT=\${1:-"build"}
+CWD=\$(pwd)
 
 scriptLog "\${PKGNAME}-\${VERSION}"
 gettar "${pkgdir}/\${TARBALL}" \$SECTION
-
 rm -rf "\$PKG" || true
 mkdir -p "\$PKG"
-CWD=\$(pwd)
 
 pushd \$COMPILEAT 2>/dev/null||true
 	tar -xvf "\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}"
