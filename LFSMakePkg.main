@@ -655,7 +655,7 @@ getData ()
 
 main ()
 {
-	local defaultdata
+	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
