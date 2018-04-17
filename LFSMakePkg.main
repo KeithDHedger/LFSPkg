@@ -629,6 +629,30 @@ finddependants ()
 		done
 }
 
+getData ()
+{
+	case $2 in
+		1)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Package name=//p" "$DATABASE"
+			;;
+		2)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Script version=//p" "$DATABASE"
+			;;
+		3)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Path to script=//p" "$DATABASE"
+			;;
+		4)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Depends=\(.*\)/'\1'/p" "$DATABASE"
+			;;
+		5)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Installed=//p" "$DATABASE"
+			;;
+		6)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Installed version=//p" "$DATABASE"
+			;;
+		esac
+}
+
 main ()
 {
 	local defaultdata
@@ -771,23 +795,55 @@ main ()
 		return
 	fi
 
-	if [ $SEARCH -eq 1 ];then
+	if [[ ! -v $SEARCH ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi
 
-		if [ $OPTCOUNT -eq 1 ];then
-			defaultdata=0
+		what=( "Package name" "Script version" "Path to script" "Depends" "Installed" "Installed version" )
+		if [ "$SEARCH" = "" ];then
 			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"
+			return
 		else
-			defaultdata=${OPTS[@]}
-			for((j=1;j<OPTCOUNT-1;j++))
-				do
-					sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s:",$2}'
-				done
-			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s",$2}'
+			que="$SEARCH"
 		fi
-		return
+
+		pkgs=( $(getData ${OPTS[0]} 1) )
+		scrvers=( $(getData ${OPTS[0]} 2) )
+		scrpath=( $(getData ${OPTS[0]} 3) )
+		eval deps=( $(getData ${OPTS[0]} 4) )
+		installed=( $(getData ${OPTS[0]} 5) )
+		instvers=( $(getData ${OPTS[0]} 6) )
+
+		for ((j=0;j<${#pkgs[@]};j++))
+			do
+				for arg in $que
+					do
+						case $arg in
+							1)
+								echo -n "${pkgs[$j]}"
+								;;
+							2)
+								echo -n "${scrvers[$j]}"
+								;;
+							3)
+								echo -n "${scrpath[$j]}"
+								;;
+							4)
+								echo -n "${deps[$j]}"
+								;;
+							5)
+								echo -n "${installed[$j]}"
+								;;
+							6)
+								echo -n "${instvers[$j]}"
+								;;
+						esac
+						echo -n ":"
+					done
+				echo
+			done
+		return		
 	fi
 
 	for ((cnt=0;cnt<OPTCOUNT;cnt++))

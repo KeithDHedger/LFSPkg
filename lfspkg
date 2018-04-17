@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sat 14 Apr 14:09:26 BST 2018
+#Tue 17 Apr 17:14:36 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -38,7 +38,6 @@ INFO=""
 PKGINFO=0
 CHECK=0
 REBUILD=0
-SEARCH=0
 NOTINSTALLED=0
 INSTALLED=0
 DEPENDSON=0
@@ -115,9 +114,6 @@ do
 		-U|--rebuild)
 			REBUILD=1
 			;;
-		-S|--search)
-			SEARCH=1
-			;;
 		-T|--notinstalled)
 			NOTINSTALLED=1
 			;;
@@ -139,6 +135,10 @@ do
 			;;
 		-Q|--setup)
 			SETUP=1
+			;;
+		-S|--search)
+			SEARCH="$2"
+			shift
 			;;
 		-N|--noaskroot)
 			NOASKROOT=1
@@ -194,7 +194,6 @@ do
 			echo "-D|--pkginfo : Print info for installed package"
 			echo "-C|--check : Try to check package version"
 			echo "-U|--rebuild : Re-build database"
-			echo "-S|--search : Search database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
 			echo "-T|--notinstalled : List packages not installed"
 			echo "-E|--installed : List installed packages"
 			echo "-O|--dependson : Find packages that depend on ARG"
@@ -202,6 +201,7 @@ do
 			echo "-W|--webpage : Try to find webpage for build"
 			echo "-K|--nocolour : Use colour in output default=on"
 			echo "-Q|--setup : Setup lfspkg.rc file"
+			echo "-S|--search : Search database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
 			echo "-N|--noaskroot : Don't check for root user"
 			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
 			echo "-s|--suffix : Suffix of package"
@@ -850,6 +850,30 @@ finddependants ()
 		done
 }
 
+getData ()
+{
+	case $2 in
+		1)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Package name=//p" "$DATABASE"
+			;;
+		2)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Script version=//p" "$DATABASE"
+			;;
+		3)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Path to script=//p" "$DATABASE"
+			;;
+		4)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Depends=\(.*\)/'\1'/p" "$DATABASE"
+			;;
+		5)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Installed=//p" "$DATABASE"
+			;;
+		6)
+			sed -n "/^Package name="$1"$/I,/Installed version=/s/Installed version=//p" "$DATABASE"
+			;;
+		esac
+}
+
 main ()
 {
 	local defaultdata
@@ -992,23 +1016,55 @@ main ()
 		return
 	fi
 
-	if [ $SEARCH -eq 1 ];then
+	if [[ ! -v $SEARCH ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi
 
-		if [ $OPTCOUNT -eq 1 ];then
-			defaultdata=0
+		what=( "Package name" "Script version" "Path to script" "Depends" "Installed" "Installed version" )
+		if [ "$SEARCH" = "" ];then
 			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"
+			return
 		else
-			defaultdata=${OPTS[@]}
-			for((j=1;j<OPTCOUNT-1;j++))
-				do
-					sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s:",$2}'
-				done
-			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"|sed -n "${OPTS[$j]}p"|awk -F= '{printf "%s",$2}'
+			que="$SEARCH"
 		fi
-		return
+
+		pkgs=( $(getData ${OPTS[0]} 1) )
+		scrvers=( $(getData ${OPTS[0]} 2) )
+		scrpath=( $(getData ${OPTS[0]} 3) )
+		eval deps=( $(getData ${OPTS[0]} 4) )
+		installed=( $(getData ${OPTS[0]} 5) )
+		instvers=( $(getData ${OPTS[0]} 6) )
+
+		for ((j=0;j<${#pkgs[@]};j++))
+			do
+				for arg in $que
+					do
+						case $arg in
+							1)
+								echo -n "${pkgs[$j]}"
+								;;
+							2)
+								echo -n "${scrvers[$j]}"
+								;;
+							3)
+								echo -n "${scrpath[$j]}"
+								;;
+							4)
+								echo -n "${deps[$j]}"
+								;;
+							5)
+								echo -n "${installed[$j]}"
+								;;
+							6)
+								echo -n "${instvers[$j]}"
+								;;
+						esac
+						echo -n ":"
+					done
+				echo
+			done
+		return		
 	fi
 
 	for ((cnt=0;cnt<OPTCOUNT;cnt++))
