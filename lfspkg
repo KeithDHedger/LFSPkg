@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue 17 Apr 17:14:36 BST 2018
+#Tue 17 Apr 20:20:27 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -876,7 +876,7 @@ getData ()
 
 main ()
 {
-	local defaultdata
+	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
