@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue 17 Apr 20:20:27 BST 2018
+#Wed 18 Apr 12:27:26 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -876,7 +876,7 @@ getData ()
 
 main ()
 {
-	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg
+	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg quearry quelen quecnt
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
@@ -1036,8 +1036,11 @@ main ()
 		installed=( $(getData ${OPTS[0]} 5) )
 		instvers=( $(getData ${OPTS[0]} 6) )
 
+		quearry=( $que )
+		quelen=( ${#quearry[@]} )
 		for ((j=0;j<${#pkgs[@]};j++))
 			do
+				quecnt=1
 				for arg in $que
 					do
 						case $arg in
@@ -1060,7 +1063,11 @@ main ()
 								echo -n "${instvers[$j]}"
 								;;
 						esac
-						echo -n ":"
+						#echo -n ">>$quecnt<<"
+						if ((quecnt < quelen));then
+							echo -n ":"
+						fi
+						((quecnt++))
 					done
 				echo
 			done
