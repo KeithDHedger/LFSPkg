@@ -1,4 +1,5 @@
 0.4.22
+Removed ':' from end of search data output.
 Improved DB search -S now takes argument.
 Updated template creation.
 Fixed missing info, post/pre install files. 
