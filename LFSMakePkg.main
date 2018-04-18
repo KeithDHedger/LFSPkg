@@ -795,7 +795,7 @@ main ()
 		return
 	fi
 
-	if [[ ! -v $SEARCH ]];then
+	if [[ -n "${SEARCH+1}" ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi

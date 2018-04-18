@@ -1,4 +1,5 @@
 0.4.22
+Fixed search for basic search for installed pkg.
 Removed ':' from end of search data output.
 Improved DB search -S now takes argument.
 Updated template creation.

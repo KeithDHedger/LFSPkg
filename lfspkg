@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Wed 18 Apr 12:27:26 BST 2018
+#Wed 18 Apr 13:41:06 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -1016,7 +1016,7 @@ main ()
 		return
 	fi
 
-	if [[ ! -v $SEARCH ]];then
+	if [[ -n "${SEARCH+1}" ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi
