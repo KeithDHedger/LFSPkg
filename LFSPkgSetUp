@@ -57,10 +57,10 @@ else
 	MAKEFLAGS=" -j$(nproc) "
 
 	XORG_PREFIX=/usr
-	XORG_CONFIG=--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static
+	XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static"
 
-	JAVA_HOME=/opt/jdk
-	QT5PREFIX=/usr
+	JAVA_HOME="/opt/jdk"
+	QT5PREFIX="/usr"
 fi
 
 #LFS Version
