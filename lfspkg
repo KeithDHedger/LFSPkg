@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sat 21 Apr 19:08:30 BST 2018
+#Thu 26 Apr 17:25:41 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -513,14 +513,17 @@ doinstall ()
 		
 		if [ -e ./preinstall ];then
 			savestdin
+				echo -e "${GREEN}Running pre-install for $pkgname ...${NORMAL}\n" >&2
 				./preinstall
 			restorestdin
 		fi
 
+		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
 		tar --keep-directory-symlink  -xvpf "$1"
 
 		if [ -e ./postinstall ];then
 			savestdin
+				echo -e "${GREEN}Running post-install for $pkgname ...${NORMAL}\n" >&2
 				./postinstall
 			restorestdin
 		fi
@@ -538,11 +541,10 @@ doinstall ()
 			mv $ROOTDIR/postinstall . &>/dev/null||true
 			mv $ROOTDIR/info . &>/dev/null||true
 		popd
-		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
-		oldsimple=$SIMPLEUPDATE
-		SIMPLEUPDATE=1
-		updatedatabase ||true
-		SIMPLEUPDATE=$oldsimple
+#		oldsimple=$SIMPLEUPDATE
+#		SIMPLEUPDATE=1
+#		updatedatabase ||true
+#		SIMPLEUPDATE=$oldsimple
 	popd
 }
 
@@ -550,14 +552,18 @@ installlfspkg ()
 {
 	if [ "X$BUILTTARBALL" != "X" ];then
 		doinstall "$BUILTTARBALL"
-		return
+#		return
+	else
+		for ((cnt=0;cnt<$OPTCOUNT;cnt++))
+			do
+				doinstall "${OPTS[$cnt]}"
+			done
 	fi
+#		oldsimple=$SIMPLEUPDATE
+#		SIMPLEUPDATE=1
+	updatedatabase ||true
+#		SIMPLEUPDATE=$oldsimple
 
-	for ((cnt=0;cnt<$OPTCOUNT;cnt++))
-		do
-			doinstall "${OPTS[$cnt]}"
-		done
-	return
 }
 
 makelfspkg ()
@@ -581,6 +587,7 @@ updatelfspkg ()
 	selectsinglepkg "update" "$searchname"
 	removelfspkg "$SELECTEDPKG"
 	doinstall "$newpkg"
+	updatedatabase||true
 }
 
 maketemplate ()
