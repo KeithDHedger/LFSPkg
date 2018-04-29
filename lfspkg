@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Thu 26 Apr 17:25:41 BST 2018
+#Sun 29 Apr 16:05:21 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -541,10 +541,6 @@ doinstall ()
 			mv $ROOTDIR/postinstall . &>/dev/null||true
 			mv $ROOTDIR/info . &>/dev/null||true
 		popd
-#		oldsimple=$SIMPLEUPDATE
-#		SIMPLEUPDATE=1
-#		updatedatabase ||true
-#		SIMPLEUPDATE=$oldsimple
 	popd
 }
 
@@ -552,18 +548,13 @@ installlfspkg ()
 {
 	if [ "X$BUILTTARBALL" != "X" ];then
 		doinstall "$BUILTTARBALL"
-#		return
 	else
 		for ((cnt=0;cnt<$OPTCOUNT;cnt++))
 			do
 				doinstall "${OPTS[$cnt]}"
 			done
 	fi
-#		oldsimple=$SIMPLEUPDATE
-#		SIMPLEUPDATE=1
 	updatedatabase ||true
-#		SIMPLEUPDATE=$oldsimple
-
 }
 
 makelfspkg ()
