@@ -301,7 +301,7 @@ checketc ()
 
 gettar ()
 {
-	local url="$1" tarname outname
+	local url="$1" outname
 	local section
 
 	if [ ${NODOWNLOAD:-0} -eq 1 ];then
@@ -315,12 +315,11 @@ gettar ()
 	fi
  
  	if [ "X$3" != "X" ];then
-		outname="-O $3"
+		outname="$3"
 	else
-		outname=""
+		outname="$(basename "$url")"
 	fi
  
-
 	if [ ! -e "$SOURCEARCHIVES" ];then
 		mkdir -vp "$SOURCEARCHIVES"||true
 	fi
@@ -333,13 +332,12 @@ gettar ()
 			return
 		fi
 
-		tarname="$(basename "$url")"
-		if [ -e $tarname ];then
+		if [ -e $outname ];then
 			popd
 			return
 		fi
 
-		if ! wget --no-check-certificate -c "$url" $outname;then
+		if ! wget --no-check-certificate -c "$url" -O $outname;then
 			echo "!!!!!!!Can't download file $1!!!!!"
 			if [ $EXITONFAIL -eq 1 ];then
 				popd
