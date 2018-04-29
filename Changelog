@@ -1,4 +1,5 @@
 0.4.22
+Fixed bug in gettar func.
 Fixed hard coded lib suffix in LFSSetUp.
 Now only updates db once at end of installing multiple pkgs.
 Fixed search for basic search for installed pkg.
