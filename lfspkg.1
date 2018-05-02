@@ -2,7 +2,6 @@
 .SH "NAME"
 \fBlfspkg\fR - A package manager for Linux From Scratch
 .br
-
 .SH "SYNOPSIS"
 \fBlfspkg\fR [\fIOPTION]... [FILE]...\fR
 .br
@@ -43,14 +42,13 @@ This is a source based package manager and dependencies can be checked for and b
 	Remove a package.
 .br
 
-\fB-t, --template\fR \fI[URL]\fR
+\fB-t, --template\fR \fI[ARG]\fR \fB[URL]\fR
 .br
 	Create LFSBuild template for source tarball \fI[URL]\fR.
 .br
-
-\fB-q, --qttemplate\fR \fI[URL]\fR
+	ARG can be any one of configure, cmake, python. python2 or python3.
 .br
-	Create LFSBuild template for QT5 source tarball \fI[URL]\fR.
+	Python will build for BOTH python 2 and 3.
 .br
 
 \fB-l, --list\fR \fI[PACKAGE]\fR

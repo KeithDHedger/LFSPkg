@@ -417,21 +417,45 @@ pushd \$COMPILEAT 2>/dev/null||true
 	tar -xvf "\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}"
 	pushd "\${TARNAME}-\${VERSION}"
 EOF
-			if [ $TEMPLATE -eq 1 ];then
-				cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+
+			case ${TEMPLATE^^} in
+				"CONFIGURE")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 		CFLAGS="\$LFSFLAGS" CXXFLAGS="\$LFSFLAGS" ./configure \${CONFIGOPTIONS}
-		make \$MAKEFLAGS||make|| exit 1
-		make install DESTDIR=\$PKG || exit 1
+		make \$MAKEFLAGS||make|| exit 100
+		make install DESTDIR=\$PKG || exit 100
 EOF
-			else
-				cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+					;;
+				"CMAKE")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 		mkdir build||true
 		cd  build
 		cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev ..
-		make \$MAKEFLAGS||make|| exit 1
-		make install DESTDIR=\$PKG || exit 1
+		make \$MAKEFLAGS||make|| exit 100
+		make install DESTDIR=\$PKG || exit 100
 EOF
-			fi
+					;;
+				"PYTHON2")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		python2 setup.py build||exit 100
+		python2 setup.py install --optimize=1 --root=\$PKG||exit 100
+EOF
+					;;
+				"PYTHON3")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		python3 setup.py build||exit 100
+		python3 setup.py install --optimize=1 --root=\$PKG||exit 100
+EOF
+					;;
+				"PYTHON")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		python2 setup.py build||exit 100
+		python2 setup.py install --optimize=1 --root=\$PKG||exit 100
+		python3 setup.py build||exit 100
+		python3 setup.py install --optimize=1 --root=\$PKG||exit 100
+EOF
+					;;
+			esac
 
 			cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 	popd
@@ -750,7 +774,7 @@ main ()
 		return
 	fi
 
-	if [ $TEMPLATE -eq 1 ] || [ $QTTEMPLATE -eq 1 ];then
+	if [ "X$TEMPLATE" != "X" ];then
 		maketemplate
 		return
 	fi
