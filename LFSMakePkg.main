@@ -677,7 +677,7 @@ getData ()
 
 main ()
 {
-	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg quearry quelen quecnt
+	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg quearry quelen quecnt searchtweak
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
@@ -821,21 +821,21 @@ main ()
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi
-
+		searchtweak=".*${OPTS[0]}.*"
 		what=( "Package name" "Script version" "Path to script" "Depends" "Installed" "Installed version" )
 		if [ "$SEARCH" = "" ];then
-			sed -n "/^Package name=${OPTS[0]}$/I,/Installed version=/p" "$DATABASE"
+			sed -n "/^Package name=${searchtweak}$/I,/Installed version=/p" "$DATABASE"
 			return
 		else
 			que="$SEARCH"
 		fi
 
-		pkgs=( $(getData ${OPTS[0]} 1) )
-		scrvers=( $(getData ${OPTS[0]} 2) )
-		scrpath=( $(getData ${OPTS[0]} 3) )
-		eval deps=( $(getData ${OPTS[0]} 4) )
-		installed=( $(getData ${OPTS[0]} 5) )
-		instvers=( $(getData ${OPTS[0]} 6) )
+		pkgs=( $(getData ${searchtweak} 1) )
+		scrvers=( $(getData ${searchtweak} 2) )
+		scrpath=( $(getData ${searchtweak} 3) )
+		eval deps=( $(getData ${searchtweak} 4) )
+		installed=( $(getData ${searchtweak} 5) )
+		instvers=( $(getData ${searchtweak} 6) )
 
 		quearry=( $que )
 		quelen=( ${#quearry[@]} )
@@ -864,7 +864,6 @@ main ()
 								echo -n "${instvers[$j]}"
 								;;
 						esac
-						#echo -n ">>$quecnt<<"
 						if ((quecnt < quelen));then
 							echo -n ":"
 						fi
