@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Wed  9 May 17:21:49 BST 2018
+#Wed 16 May 12:20:58 BST 2018
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -137,6 +137,10 @@ do
 			SEARCH="$2"
 			shift
 			;;
+		-Z|--fuzzy)
+			FUZZY="$2"
+			shift
+			;;
 		-N|--noaskroot)
 			NOASKROOT=1
 			;;
@@ -198,6 +202,7 @@ do
 			echo "-K|--nocolour : Use colour in output default=on"
 			echo "-Q|--setup : Setup lfspkg.rc file"
 			echo "-S|--search : Search database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
+			echo "-Z|--fuzzy : Fuzzy search of database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
 			echo "-N|--noaskroot : Don't check for root user"
 			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
 			echo "-s|--suffix : Suffix of package"
@@ -1034,17 +1039,27 @@ main ()
 		return
 	fi
 
-	if [[ -n "${SEARCH+1}" ]];then
+	if [[ -n "${SEARCH+1}" ]] || [[ -n "${FUZZY+1}" ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
 		fi
-		searchtweak=".*${OPTS[0]}.*"
 		what=( "Package name" "Script version" "Path to script" "Depends" "Installed" "Installed version" )
-		if [ "$SEARCH" = "" ];then
+		
+		if [[ -n "${FUZZY+1}" ]];then
+			searchtweak=".*${OPTS[0]}.*"
+		else
+			searchtweak="${OPTS[0]}"
+		fi
+
+		if [ "$SEARCH" = "" ] && [ "$FUZZY" = "" ];then
 			sed -n "/^Package name=${searchtweak}$/I,/Installed version=/p" "$DATABASE"
 			return
 		else
-			que="$SEARCH"
+			if [[ -n "${SEARCH+1}" ]];then
+				que="$SEARCH"
+			else
+				que="$FUZZY"
+			fi
 		fi
 
 		pkgs=( $(getData ${searchtweak} 1) )
