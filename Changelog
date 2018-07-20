@@ -1,4 +1,5 @@
 0.4.22
+Made version for 8.2 backward compatable with older scripts.
 Split DB search into "-S" exact search ( regex ) and "-Z" fuzzy search ( ".*regex.*" ).
 Setting env var FORCEDOWNLOAD=1 will force download a new source archive.
 Auto added ".*" to front and back of search arg to -S.

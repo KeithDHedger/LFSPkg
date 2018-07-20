@@ -636,7 +636,7 @@ checkforversion ()
 packageclean ()
 {
 	local pkgname="$1"
-	local scriptfolder="$2"
+	local scriptfolder="${2:-.}"
 
 	if [ -e "$scriptfolder/preinstall" ];then
 		cp "$scriptfolder/preinstall" "$pkgname"
