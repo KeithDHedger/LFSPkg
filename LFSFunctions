@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #
 #©K. D. Hedger. Tue 31 Jul 12:03:09 BST 2018 keithdhedger@gmail.com
 #
@@ -61,23 +60,22 @@ esac
 export LIBDIRSUFFIX LFSFLAGS
 
 if [ "X$NOLOADCONFIG" = "X" ];then
-	if [ -e /etc/lfspkg.rc ];then
-		. /etc/lfspkg.rc
-	fi
-
 	if [ -e ~/.lfspkg.rc ];then
 		. ~/.lfspkg.rc
+	else
+		if [ -e /etc/lfspkg.rc ];then
+			. /etc/lfspkg.rc
+		fi
 	fi
 fi
 
 TMP=${TMP:-/tmp/LFS}
 OUTPUT=${OUTPUT:-$TMP}
 XORG_PREFIX=${XORG_PREFIX:-/usr}
-
 if [ ! -d "$TMP" ];then mkdir -p "$TMP" &>/dev/null;fi
-if [ ! -d "$OUTPUT" ];then mkdir -p "$OUTPUT" &>/dev/null;fi
-if [ ! -d "$SOURCEARCHIVES" ];then mkdir -p "$SOURCEARCHIVES" &>/dev/null;fi
-if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null;fi
+if [ ! -d "$OUTPUT" ];then mkdir -p "$OUTPUT" &>/dev/null ||true;fi
+if [ ! -d "$SOURCEARCHIVES" ];then mkdir -p "$SOURCEARCHIVES" &>/dev/null ||true;fi
+if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null ||true;fi
 
 export TMP OUTPUT XORG_PREFIX
 SCRIPTLOG=${SCRIPTLOG:-0}

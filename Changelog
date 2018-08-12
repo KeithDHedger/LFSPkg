@@ -1,4 +1,5 @@
 0.4.22
+Fixed building as normal user.
 Changed website/email.
 Made version for 8.2 backward compatable with older scripts.
 Split DB search into "-S" exact search ( regex ) and "-Z" fuzzy search ( ".*regex.*" ).
