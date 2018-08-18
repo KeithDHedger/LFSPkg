@@ -71,13 +71,57 @@ fi
 
 TMP=${TMP:-/tmp/LFS}
 OUTPUT=${OUTPUT:-$TMP}
-XORG_PREFIX=${XORG_PREFIX:-/usr}
-if [ ! -d "$TMP" ];then mkdir -p "$TMP" &>/dev/null;fi
-if [ ! -d "$OUTPUT" ];then mkdir -p "$OUTPUT" &>/dev/null ||true;fi
-if [ ! -d "$SOURCEARCHIVES" ];then mkdir -p "$SOURCEARCHIVES" &>/dev/null ||true;fi
-if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null ||true;fi
+#XORG_PREFIX=${XORG_PREFIX:-/usr}
+#if [ ! -d "$TMP" ];then mkdir -p "$TMP" &>/dev/null;fi
+#if [ ! -d "$OUTPUT" ];then mkdir -p "$OUTPUT" &>/dev/null ||true;fi
+#if [ ! -d "$SOURCEARCHIVES" ];then mkdir -p "$SOURCEARCHIVES" &>/dev/null ||true;fi
+#if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null ||true;fi
 
-export TMP OUTPUT XORG_PREFIX
+#export TMP OUTPUT XORG_PREFIX
+
+sanitycheckfolder ()
+{
+	if [ "X$1" == "X" ];then
+		echo "NOTSET"
+		return
+	fi
+
+	if [ ! -w  "$1" ];then
+		echo "NOTWRITABLE"
+		return
+	fi
+
+	if [ ! -r  "$1" ];then
+		echo "NOTREADABLE"
+		return
+	fi
+	echo "OK"
+}
+
+sanitycheck ()
+{
+	if [ "$(sanitycheckfolder "$COMPILEAT")" = "NOTWRITABLE" ];then
+		echo "Can't write to $COMPILEAT defined by COMPILEAT"
+		stat -c "%U:%G %A" "$OUTPUT"
+		exit 200
+	fi
+
+	if [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTREADABLE" ] || [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTWRITABLE" ];then
+		echo "Can't read/write to/from $SOURCEARCHIVES defined by SOURCEARCHIVES"
+		stat -c "%U:%G %A" "$SOURCEARCHIVES"
+		exit 200
+	fi
+
+	if [ "$(sanitycheckfolder "$OUTPUT")" = "NOTWRITABLE" ];then
+		echo "Can't write to $OUTPUT defined by OUTPUT"
+		stat -c "%U:%G %A" "$OUTPUT"
+		exit 200
+	fi
+}
+
+sanitycheck
+
+export TMP OUTPUT
 SCRIPTLOG=${SCRIPTLOG:-0}
 LOGDIR=${LOGDIR:-"/tmp/logs"}
 
@@ -673,4 +717,3 @@ packageclean ()
 	popd
 	ldconfig||true
 }
-

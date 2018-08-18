@@ -1,4 +1,5 @@
 0.4.22
+Added basic sanity check in LFSFunctions.
 Fixed building as normal user.
 Changed website/email.
 Made version for 8.2 backward compatable with older scripts.
