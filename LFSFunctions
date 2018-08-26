@@ -714,6 +714,7 @@ packageclean ()
 	pushd "$pkgname"
 		find "$pkgname" -iname "*.la" -exec rm '{}' \;
 		find | xargs file | grep -e "executable" -e "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+		rm -rf tmp
 	popd
 	ldconfig||true
 }
