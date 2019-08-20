@@ -230,7 +230,7 @@ findArchive ()
 	local suffix="$3"
 
 	echo -e "${GREEN}Checking ...${NORMAL}" >&2
-	links -dump "$url"|grep "$name" |awk '{print $NF}'|grep "${suffix}$"|sort -r|head -n1
+	links -ftp.use-passive 1 -dump "$url"|grep "$name" |awk '{print $NF}'|grep "${suffix}$"|sort -r|head -n1
 }
 
 checkversion ()

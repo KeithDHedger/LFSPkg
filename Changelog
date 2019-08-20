@@ -1,4 +1,5 @@
 0.4.22
+Set pasissive mode on links ftp in findArchive function.
 The pkgclean function now removes the /tmp folder from the package.
 Added basic sanity check in LFSFunctions.
 Fixed building as normal user.
