@@ -81,6 +81,7 @@ int				spindelay=0;
 bool			quiet=false;
 char			*strBuffer[PATH_MAX]={0,};
 char			*pBuffer=(char*)&strBuffer;
+bool			anyVersion=false;
 
 char* cleanFolderPath(const char* path)
 {
@@ -510,7 +511,11 @@ void listDepends(char* depstr)
 
 					if(scripts[scriptnum].installed==true)
 						{
-							int result=multiCheck(wantversion,scripts[scriptnum].installedVersion,scripts[scriptnum].version);
+							int result;
+							if(anyVersion==true)
+								result=0;
+							else
+								result=multiCheck(wantversion,scripts[scriptnum].installedVersion,scripts[scriptnum].version);
 							switch(result)
 								{
 								case 0:
@@ -527,7 +532,7 @@ void listDepends(char* depstr)
 						}
 					else
 						{
-							if(checkversionnumber(wantversion,scripts[scriptnum].version)<=0)
+							if((checkversionnumber(wantversion,scripts[scriptnum].version)<=0) || (anyVersion==true))
 								{
 									asprintf(&dependsList[numDepends].doWhat,"%s install",dependsList[numDepends].scriptPath);
 								}
@@ -606,11 +611,18 @@ int main(int argc, char **argv)
 			listDepends(correctedArgv);
 			break;
 
+		case 'Z':
+			anyVersion=true;
 		case 'B':
 			quiet=true;
 			listDepends(correctedArgv);
 			for(int j=0; j<numDepends; j++)
 				{
+				if(anyVersion==true)
+					{
+						free(dependsList[j].version);
+						dependsList[j].version=strdup("0.0");
+					}
 					if(dependsList[j].doWhat!=NULL)
 						printf("%s\n",dependsList[j].doWhat);
 				}

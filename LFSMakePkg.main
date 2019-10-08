@@ -553,8 +553,10 @@ remakepkg ()
 builddeps()
 {
 	local what=""
+	local buildtype="B"
 
 	if [ X"$NODEPS" != "X" ];then return;fi
+	if [ X"$ANYVERSION" != "X" ];then buildtype="Z";fi
 
 	while read SCRIPT
 		do
@@ -578,7 +580,7 @@ builddeps()
 					restorestdin
 				popd
 			fi
-		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} B "$BUILDDEPS")
+		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} $buildtype "$BUILDDEPS")
 }
 
 updatedatabase ()
