@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun  6 Oct 17:21:24 BST 2019
+#Fri 18 Oct 12:14:35 BST 2019
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -180,7 +180,7 @@ do
 			echo "-m|--make : Make package"
 			echo "-u|--upgrade : Upgrade package"
 			echo "-r|--remove : Remove package"
-			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,cmake or python[2|3]"
+			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,meson,cmake or python[2|3]"
 			echo "-l|--list : List installed files"
 			echo "-f|--find : Find installed file"
 			echo "-L|--less : Pipe output from list/find to less"
@@ -648,9 +648,20 @@ EOF
 		make install DESTDIR=\$PKG || exit 100
 EOF
 					;;
+
+				"MESON")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		mkdir build || true
+		cd build
+		meson \${MESONCONFIGOPTIONS} ..
+		ninja \$MAKEFLAGS||ninja -j1||exit 100
+		DESTDIR=\$PKG ninja install
+EOF
+					;;
+
 				"CMAKE")
 					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		mkdir build||true
+		mkdir build || true
 		cd  build
 		cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev ..
 		make \$MAKEFLAGS||make|| exit 100

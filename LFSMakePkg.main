@@ -426,9 +426,20 @@ EOF
 		make install DESTDIR=\$PKG || exit 100
 EOF
 					;;
+
+				"MESON")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		mkdir build || true
+		cd build
+		meson \${MESONCONFIGOPTIONS} ..
+		ninja \$MAKEFLAGS||ninja -j1||exit 100
+		DESTDIR=\$PKG ninja install
+EOF
+					;;
+
 				"CMAKE")
 					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		mkdir build||true
+		mkdir build || true
 		cd  build
 		cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev ..
 		make \$MAKEFLAGS||make|| exit 100

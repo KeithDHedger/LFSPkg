@@ -28,7 +28,7 @@ readWithDefault ()
 
 	read -e -p "$message [ ${varcontents} ] "
 	if [ "X$REPLY" != "X" ];then
-		eval "${varname}=$REPLY"
+		eval "${varname}=\"$REPLY\""
 	fi
 }
 
@@ -45,14 +45,15 @@ esac
 if [ -e ~/.lfspkg.rc ];then
 	. ~/.lfspkg.rc
 else
-	LFSVERSION=8.0
+	LFSVERSION=9.0
 	BUILDSCRIPTS=/LFSPkgBuildScripts/
-	OUTPUT=LFSBuiltPackages/8.0
-	SOURCEARCHIVES=/LFSSourceArchives/8.0
+	OUTPUT=LFSBuiltPackages/9.0
+	SOURCEARCHIVES=/LFSSourceArchives/9.0
 	COMPILEAT=/LFSBuiltPackages
 	SCRIPTLOG=1
 
-	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --enable-gtk-doc --disable-debug --disable-nls --disable-static"
+	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --enable-gtk-doc --disable-debug --disable-nls --disable-static"
+	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"
 	CHECKETC=1
 	MAKEFLAGS=" -j$(nproc) "
 
@@ -93,6 +94,10 @@ readWithDefault "SCRIPTLOG" "Log Output From Scripts, 0 = Don't Log"
 #general config options
 CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
 readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
+
+#config options for meson
+MESONCONFIGOPTIONS=${MESONCONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"}
+readWithDefault "MESONCONFIGOPTIONS" "Enter Basic Options For \"meson\" Scripts"
 
 #check /etc/ for config file clashes
 CHECKETC=${CHECKETC:-1}
