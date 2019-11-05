@@ -618,11 +618,11 @@ int main(int argc, char **argv)
 			listDepends(correctedArgv);
 			for(int j=0; j<numDepends; j++)
 				{
-				if(anyVersion==true)
-					{
-						free(dependsList[j].version);
-						dependsList[j].version=strdup("0.0");
-					}
+					if(anyVersion==true)
+						{
+							free(dependsList[j].version);
+							dependsList[j].version=strdup("0.0");
+						}
 					if(dependsList[j].doWhat!=NULL)
 						printf("%s\n",dependsList[j].doWhat);
 				}

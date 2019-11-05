@@ -402,8 +402,9 @@ gettar ()
 			return
 		fi
 
-		if ! wget --no-check-certificate -c "$url" -O $outname;then
+		if ! wget --no-check-certificate -c "$url" -O "$outname";then
 			echo "!!!!!!!Can't download file $1!!!!!"
+			rm "$outname"
 			if [ $EXITONFAIL -eq 1 ];then
 				popd
 				exit -1
