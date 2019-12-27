@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue  5 Nov 12:45:16 GMT 2019
+#Fri 27 Dec 16:02:49 GMT 2019
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -16,7 +16,7 @@ lfspkgargs ()
 {
 
 APPNAME="lfspkg"
-VERSION="0.4.22"
+VERSION="0.4.23"
 
 COMMIT=0
 INSTALL=0
@@ -172,6 +172,9 @@ do
 			PKGVERSION="$2"
 			shift
 			;;
+		-Y|--dryrun)
+			DRYRUN=1
+			;;
 		'-?'|--help|-h)
 			echo $APPNAME - Version $VERSION
 			echo "Useage: $APPNAME [option] ..."
@@ -211,6 +214,7 @@ do
 			echo "-o|--output : Output archive to this folder"
 			echo "-n|--name : Name of package"
 			echo "-p|--pkgversion : Version of package"
+			echo "-Y|--dryrun : Just print what would be done"
 			exit 0
 			;;
 		-v|--version)
@@ -297,6 +301,7 @@ init ()
 	mkdir -vp "$PKGFOLDER" "$DATABASEFOLDER" ||true
 	ROOTDIR=$(cleanFolderPath $ROOTDIR)
 	BUILDSCRIPTS=$(cleanFolderPath $BUILDSCRIPTS)
+	DRYRUN=${DRYRUN:-0}
 
 	export ROOTDIR BUILDSCRIPTS
 }
@@ -506,8 +511,14 @@ doinstall ()
 	local callingfolder
 	local oldsimple
 
+	
 	pkgfolder="$(basename "${pkgpath%-?*}")"
 	pkgname="$(basename "${pkgpath/.tar.gz/}")"
+
+	if [ $DRYRUN -eq 1 ];then
+		echo -e "Installing (Simultated) ${GREEN}${pkgname}${NORMAL} To ${RED}${ROOTDIR} ...\n" >&2
+		return
+	fi
 
 	pushd "$ROOTDIR"
 		tar --keep-directory-symlink  -xpf "$1" ./preinstall &>/dev/null||true
@@ -575,11 +586,48 @@ updatelfspkg ()
 	local searchname="${OPTS[0]}"
 	local newpkg="${OPTS[1]}"
 	local installedname="$(basename ${newpkg} .tar.gz)"
+	local togo
+	local updated
+	local flag
 
 	selectsinglepkg "update" "$searchname"
-	removelfspkg "$SELECTEDPKG"
+	if [ "X$SELECTEDPKG" = "X" ];then
+		return
+	fi
+
 	doinstall "$newpkg"
-	updatedatabase||true
+	pkgfolder="$(basename "${SELECTEDPKG%-?*}")"
+	tar --list -f "$newpkg"|sort -r >/tmp/newp.$$
+	tar -Oxf /var/lib/lfspkg/packages/${pkgfolder}/*_LFSPKG.tar.gz|sort -r >/tmp/old.$$
+
+	echo -e "Removing orphaned files from ${GREEN}${pkgfolder}${NORMAL} From ${RED}${ROOTDIR}${NORMAL} ...\n" >&2
+	if [ $DRYRUN -eq 1 ];then
+		pushd $ROOTDIR
+			while read togo
+				do
+					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
+						echo -e "Removing (Simultated) "${RED}${togo}${NORMAL}" ..."
+					fi
+				done < <(cat /tmp/old.$$)
+		popd
+		echo -e "(Simultated) ${GREEN}rm -rvf ${RED}/var/lib/lfspkg/packages/${pkgfolder}${NORMAL}"
+		echo -e "(Simultated) ${RED}updatedatabase${NORMAL}"
+	else
+		pushd $ROOTDIR
+			while read togo
+				do
+					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
+						echo -e "Removing "${RED}${togo}${NORMAL}" ..."
+						rm -f "${togo}" &>/dev/null||true
+						rmdir "${togo}" &>/dev/null||true
+					fi
+				done < <(cat /tmp/old.$$)
+		popd
+		rm -rvf /var/lib/lfspkg/packages/${pkgfolder}
+		updatedatabase
+	fi
+
+	rm /tmp/newp.$$ /tmp/old.$$
 }
 
 maketemplate ()
@@ -802,16 +850,23 @@ builddeps()
 					echo -e "${RED}ABORTING !!!${NORMAL}"
 					exit 100
 				fi
-				pushd "$(dirname "$SCRIPT")"
-					savestdin
-						what=${SCRIPT##?* }
-						if ! NODEPS=true ./$(basename $SCRIPT) $what;then
-							echo -e "${RED}Build error with $SCRIPT...${NORMAL}"
-							restorestdin
-							exit -1
-						fi
-					restorestdin
-				popd
+
+				if [ $DRYRUN -eq 1 ];then
+					echo -e "${NORMAL}Running (Simultated) ${GREEN}./$(basename $SCRIPT) ${SCRIPT##?* }${NORMAL} To ${RED}${ROOTDIR}${NORMAL} ..." >&2
+					continue
+				else
+					pushd "$(dirname "$SCRIPT")"
+						savestdin
+							what=${SCRIPT##?* }
+
+							if ! NODEPS=true ./$(basename $SCRIPT) $what;then
+								echo -e "${RED}Build error with $SCRIPT...${NORMAL}"
+								restorestdin
+								exit -1
+							fi
+						restorestdin
+					popd
+				fi
 			fi
 		done < <($FINDHELPER ${BUILDSCRIPTS} ${ROOTDIR} $buildtype "$BUILDDEPS")
 }
@@ -1150,7 +1205,7 @@ lfspkgargs "$@"
 set -- "${OPTS[@]}"
 
 init
-if [ $NOASKROOT -eq 0 ];then
+if [ $NOASKROOT -eq 0 ] && [ $DRYRUN -eq 0 ];then
 	checkforoot
 fi
 main

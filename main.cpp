@@ -524,7 +524,7 @@ void listDepends(char* depstr)
 									asprintf(&dependsList[numDepends].doWhat,"%s upgrade",dependsList[numDepends].scriptPath);
 									break;
 								case -1:
-									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s" NORMAL " is to low for dependency " BLUE "%s\n" NORMAL,dependsList[numDepends].scriptPath,strippedstring);
+									fprintf(stderr,"\r" RED "ERROR " NORMAL "Version of build script " GREEN "%s%s" NORMAL " is to low for dependency " BLUE "%s\n" NORMAL,rootFolder,&dependsList[numDepends].scriptPath[1],strippedstring);
 									fprintf(stdout,"%s\n","ERROR");
 									exit(100);
 									break;
