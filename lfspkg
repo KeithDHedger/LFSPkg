@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Fri 27 Dec 16:02:49 GMT 2019
+#Sat 28 Dec 14:44:48 GMT 2019
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -606,7 +606,9 @@ updatelfspkg ()
 			while read togo
 				do
 					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
-						echo -e "Removing (Simultated) "${RED}${togo}${NORMAL}" ..."
+						if [ ! "${togo:0:6}" = "./etc/" ];then
+							echo -e "Removing (Simultated) "${RED}${togo}${NORMAL}" ..."
+						fi
 					fi
 				done < <(cat /tmp/old.$$)
 		popd
@@ -617,9 +619,11 @@ updatelfspkg ()
 			while read togo
 				do
 					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
-						echo -e "Removing "${RED}${togo}${NORMAL}" ..."
-						rm -f "${togo}" &>/dev/null||true
-						rmdir "${togo}" &>/dev/null||true
+						if [ ! "${togo:0:6}" = "./etc/" ];then
+							echo -e "Removing "${RED}${togo}${NORMAL}" ..."
+							rm -f "${togo}" &>/dev/null||true
+							rmdir "${togo}" &>/dev/null||true
+						fi
 					fi
 				done < <(cat /tmp/old.$$)
 		popd
