@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sat 28 Dec 14:44:48 GMT 2019
+#Sun 29 Dec 15:03:20 GMT 2019
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -215,6 +215,15 @@ do
 			echo "-n|--name : Name of package"
 			echo "-p|--pkgversion : Version of package"
 			echo "-Y|--dryrun : Just print what would be done"
+			echo -e "
+Some Important Envirronment Variables:
+CHECKETC 0=Don't check for possible config files, 1=check.
+NODOWNLOAD 0=download tarball, 1=Don't download tarball.
+FORCEDOWNLOAD !='' Remove old tarball before downloading.
+NODEPS !='' Don't build dependencies.
+ANYVERSION !='' Ignore version
+SIMPLEUPDATE 0=Full update of db, 1=Only update as needed.
+"
 			exit 0
 			;;
 		-v|--version)
@@ -612,7 +621,9 @@ updatelfspkg ()
 					fi
 				done < <(cat /tmp/old.$$)
 		popd
-		echo -e "(Simultated) ${GREEN}rm -rvf ${RED}/var/lib/lfspkg/packages/${pkgfolder}${NORMAL}"
+		if [ ! "$(basename ${newpkg%-?*})" = "${pkgfolder}" ];then
+			echo -e "(Simultated) ${GREEN}rm -rvf ${RED}/var/lib/lfspkg/packages/${pkgfolder}${NORMAL}"
+		fi
 		echo -e "(Simultated) ${RED}updatedatabase${NORMAL}"
 	else
 		pushd $ROOTDIR
@@ -627,7 +638,9 @@ updatelfspkg ()
 					fi
 				done < <(cat /tmp/old.$$)
 		popd
-		rm -rvf /var/lib/lfspkg/packages/${pkgfolder}
+		if [ ! "$(basename ${newpkg%-?*})" = "${pkgfolder}" ];then
+			rm -rvf /var/lib/lfspkg/packages/${pkgfolder}
+		fi
 		updatedatabase
 	fi
 
