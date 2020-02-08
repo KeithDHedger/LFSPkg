@@ -719,3 +719,26 @@ packageclean ()
 	popd
 	ldconfig||true
 }
+
+extractarchive ()
+{
+	local archive="$1"
+	local what=$2
+	local comm="tar -xvf"
+
+	case $what in
+		"zip")
+			comm="unzip"
+			;;
+	esac
+
+	if [ $UID -eq 0 ];then
+		su -m lfspkguser -c "( $comm "$archive" )"
+	else
+		$comm "$archive"
+	fi
+
+	
+
+}
+
