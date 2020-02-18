@@ -1,4 +1,5 @@
 0.4.22
+Extractarchive function will now guess whether to use tar -x or unzip, can be overridden.
 Added 'meson' option to templates.
 Fixed bug when entering options with spaces in LFSPkgSetUp.
 Added MESONCONFIGOPTIONS to LFSPkgSetUp.

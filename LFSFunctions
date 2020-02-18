@@ -725,10 +725,17 @@ extractarchive ()
 	local archive="$1"
 	local what=$2
 	local comm="tar -xvf"
+	local upname
 
 	case $what in
 		"zip")
 			comm="unzip"
+			;;
+		*)
+			upname="${archive^^}"
+			if [ "${upname##?*.}" = "ZIP" ];then
+				comm=unzip
+			fi
 			;;
 	esac
 
