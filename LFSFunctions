@@ -741,7 +741,7 @@ extractarchive ()
 
 	if [ $UID -eq 0 ];then
 		if [ "X$NOCHANGEUSER" = "X" ];then
-			/bin/su -m lfspkguser -c "( $comm "$archive" )"
+			su -m lfspkguser -c "( $comm "$archive" )"
 		else
 			$comm "$archive"
 		fi
