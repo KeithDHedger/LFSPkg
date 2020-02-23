@@ -60,12 +60,8 @@ esac
 export LIBDIRSUFFIX LFSFLAGS
 
 if [ "X$NOLOADCONFIG" = "X" ];then
-	if [ -e ~/.lfspkg.rc ];then
-		. ~/.lfspkg.rc
-	else
-		if [ -e /etc/lfspkg.rc ];then
-			. /etc/lfspkg.rc
-		fi
+	if [ -e /etc/lfspkg.rc ];then
+		. /etc/lfspkg.rc
 	fi
 fi
 

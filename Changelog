@@ -1,5 +1,10 @@
-0.4.22
+0.4.23
+Running  lfspkg --setup now needs to be run as root.
+Tweaks to defaults in lfspkg.rc and LFSPkgSetUp.
+Removed loading of local rc file, now only uses global rc ie:/etc/lfspkg.rc
 Extractarchive function will now guess whether to use tar -x or unzip, can be overridden.
+
+0.4.22
 Added 'meson' option to templates.
 Fixed bug when entering options with spaces in LFSPkgSetUp.
 Added MESONCONFIGOPTIONS to LFSPkgSetUp.

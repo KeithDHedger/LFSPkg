@@ -19,6 +19,8 @@
 # along with BootCD.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+LOCALLFSVERSION=9.0
+
 #$1=varname $2=message
 readWithDefault ()
 {
@@ -42,30 +44,51 @@ case $(uname -m) in
 esac
 
 #set variables if possible
-if [ -e ~/.lfspkg.rc ];then
-	. ~/.lfspkg.rc
+if [ -e /etc/lfspkg.rc ];then
+	. /etc/lfspkg.rc
 else
-	LFSVERSION=9.0
+	LFSVERSION=$LOCALLFSVERSION
+	LIBDIRSUFFIX=
 	BUILDSCRIPTS=/LFSPkgBuildScripts/
-	OUTPUT=LFSBuiltPackages/9.0
-	SOURCEARCHIVES=/LFSSourceArchives/9.0
-	COMPILEAT=/LFSBuiltPackages
+	OUTPUT=LFSBuiltPackages/$LOCALLFSVERSION
+	SOURCEARCHIVES=/LFSSourceArchives/$LOCALLFSVERSION
+	COMPILEAT=/LFSBuiltPackages/$LOCALLFSVERSION
 	SCRIPTLOG=1
 
 	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --enable-gtk-doc --disable-debug --disable-nls --disable-static"
 	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"
 	CHECKETC=1
-	MAKEFLAGS=" -j$(nproc) "
+	MAKEFLAGS="-j1"
 
 	XORG_PREFIX=/usr
 	XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static"
 
 	JAVA_HOME="/opt/jdk"
+	#qt5 and cmake stuff
 	QT5PREFIX="/usr"
+	QT5DIR=$QT5PREFIX/lib${LIBDIRSUFFIX}/qt5
+	CMAKE_INSTALL_PREFIX="$QT5PREFIX"
+	CMAKE_PREFIX_PATH=$QT5DIR/cmake
+	PATH="${QT5DIR}:${PATH}"
+
+	DEFLIBSUFFIX=$LIBDIRSUFFIX
+	DEFUSEQT5=TRUE
+	DEFCMAKELINKERFLAGS="-L$QT5DIR"
+
+	CMAKEINSTALLPREFIX="-DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX"
+	CMAKEPREFIXPATH="-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
+	CMAKELIBDIRSUFFIX="-DLIB_SUFFIX=$DEFLIBSUFFIX"
+	CMAKEUSEQT5="-DUSE_QT5=$DEFUSEQT5"
+	CMAKELDFLAGS="-DCMAKE_EXE_LINKER_FLAGS=$DEFCMAKELINKERFLAGS"
+
+	export CMAKE_PREFIX_PATH
+	export CMAKE_INSTALL_PREFIX
+	export PATH
+	export QT5DIR
 fi
 
 #LFS Version
-LFSVERSION=${LFSVERSION:-"8.0"}
+LFSVERSION=${LFSVERSION:-"9.0"}
 readWithDefault "LFSVERSION" "Enter Version"
 
 #libdir suffix
@@ -88,8 +111,12 @@ COMPILEAT=${COMPILEAT:-""}
 readWithDefault "COMPILEAT" "Compile In This Folder Instead Of In Pkg Folder"
 
 #log op from scripts
-SCRIPTLOG=${SCRIPTLOG:-0}
+SCRIPTLOG=${SCRIPTLOG:-1}
 readWithDefault "SCRIPTLOG" "Log Output From Scripts, 0 = Don't Log"
+
+#check /etc/ for config file clashes
+CHECKETC=${CHECKETC:-1}
+readWithDefault "CHECKETC" "Check /etc For Possible Config File Clashes, 0 = No Check"
 
 #general config options
 CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
@@ -98,10 +125,6 @@ readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
 #config options for meson
 MESONCONFIGOPTIONS=${MESONCONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"}
 readWithDefault "MESONCONFIGOPTIONS" "Enter Basic Options For \"meson\" Scripts"
-
-#check /etc/ for config file clashes
-CHECKETC=${CHECKETC:-1}
-readWithDefault "CHECKETC" "Check /etc For Possible Config File Clashes, 0 = No Check"
 
 #general purpose make flags
 MAKEFLAGS=${MAKEFLAGS:-" -j$(nproc) "}
@@ -135,11 +158,11 @@ echo "OUTPUT=$OUTPUT"
 echo "SOURCEARCHIVES=$SOURCEARCHIVES"
 echo "COMPILEAT=$COMPILEAT"
 echo "SCRIPTLOG=$SCRIPTLOG"
+echo "CHECKETC=$CHECKETC"
 echo
 echo "CONFIGOPTIONS=$CONFIGOPTIONS"
 echo "MESONCONFIGOPTIONS=$MESONCONFIGOPTIONS"
 echo
-echo "CHECKETC=$CHECKETC"
 echo "MAKEFLAGS=$MAKEFLAGS"
 echo
 echo "XORG_PREFIX=$XORG_PREFIX"
@@ -157,7 +180,7 @@ if [ $SUMMARY = "n" ];then
 	exit 1
 fi
 
-cat > ~/.lfspkg.rc << EOF
+cat > /etc/lfspkg.rc << EOF
 LFSVERSION=$LFSVERSION
 LIBDIRSUFFIX=$LIBDIRSUFFIX
 BUILDSCRIPTS="$BUILDSCRIPTS"
@@ -165,11 +188,11 @@ OUTPUT="$OUTPUT"
 SOURCEARCHIVES="$SOURCEARCHIVES"
 COMPILEAT=$COMPILEAT
 SCRIPTLOG=$SCRIPTLOG
+CHECKETC=$CHECKETC
 
 CONFIGOPTIONS="$CONFIGOPTIONS"
 MESONCONFIGOPTIONS="$MESONCONFIGOPTIONS"
 
-CHECKETC=$CHECKETC
 MAKEFLAGS="$MAKEFLAGS"
 
 XORG_PREFIX="$XORG_PREFIX"

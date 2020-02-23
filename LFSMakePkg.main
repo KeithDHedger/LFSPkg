@@ -975,7 +975,7 @@ main ()
 
 checkforoot ()
 {
-	if [ $INSTALL -eq 1 ] || [ $REMOVE -eq 1 ] || [ $UPGRADE -eq 1 ] || [ $COMMIT -eq 1 ] || [ $PREINSTALL -eq 1 ] || [ $POSTINSTALL -eq 1 ];then
+	if [ $SETUP -eq 1 ] || [ $INSTALL -eq 1 ] || [ $REMOVE -eq 1 ] || [ $UPGRADE -eq 1 ] || [ $COMMIT -eq 1 ] || [ $PREINSTALL -eq 1 ] || [ $POSTINSTALL -eq 1 ];then
 		if [ $UID -ne 0 ];then
 			echo "You need to be ROOT to make file system changes ..."
 			exit 1
