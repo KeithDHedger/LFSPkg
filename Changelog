@@ -1,5 +1,5 @@
 0.4.23
-Tweaks for Pi4
+Tweaks for Pi4.
 Running  lfspkg --setup now needs to be run as root.
 Tweaks to defaults in lfspkg.rc and LFSPkgSetUp.
 Removed loading of local rc file, now only uses global rc ie:/etc/lfspkg.rc
