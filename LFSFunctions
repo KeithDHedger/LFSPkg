@@ -44,10 +44,12 @@ case "$ARCH" in
 		LIBDIRSUFFIX="64"
 		;;
 	"armv7l")
+		PIBUILD=1
 		LFSFLAGS="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard"
 		LIBDIRSUFFIX=""
 		;;
 	"armv6l")
+		PIBUILD=1
 		LFSFLAGS="-O2 -march=armv6j -mfpu=vfp -mfloat-abi=hard"
 		LIBDIRSUFFIX=""
 		;;
@@ -62,6 +64,13 @@ export LIBDIRSUFFIX LFSFLAGS
 if [ "X$NOLOADCONFIG" = "X" ];then
 	if [ -e /etc/lfspkg.rc ];then
 		. /etc/lfspkg.rc
+	fi
+fi
+
+PIBUILD=${PIBUILD:-0}
+if [ $PIBUILD -eq 1 ];then
+	if [ $PIVERS -eq 4 ];then
+		LFSFLAGS="-O2 -mcpu=cortex-a72 -mtune=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard"
 	fi
 fi
 

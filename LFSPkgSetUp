@@ -20,6 +20,8 @@
 #
 
 LOCALLFSVERSION=9.0
+PIBUILD=0
+PIVERS=4
 
 #$1=varname $2=message
 readWithDefault ()
@@ -35,6 +37,11 @@ readWithDefault ()
 }
 
 case $(uname -m) in
+	arm*)
+		PIBUILD=1
+		LIBDIRSUFFIX=""
+		;;
+
 	x86_64)
 		LIBDIRSUFFIX=64
 		;;
@@ -48,6 +55,9 @@ if [ -e /etc/lfspkg.rc ];then
 	. /etc/lfspkg.rc
 else
 	LFSVERSION=$LOCALLFSVERSION
+	PIBUILD=$PIBUILD
+	PIVERS=$PIVERS
+
 	LIBDIRSUFFIX=
 	BUILDSCRIPTS=/LFSPkgBuildScripts/
 	OUTPUT=LFSBuiltPackages/$LOCALLFSVERSION
@@ -90,6 +100,12 @@ fi
 #LFS Version
 LFSVERSION=${LFSVERSION:-"9.0"}
 readWithDefault "LFSVERSION" "Enter Version"
+
+#for rpi
+if [ $PIBUILD -eq 1 ];then
+	PIVERS=${PIVERS:-"4"}
+	readWithDefault "PIVERS" "Enter Pi Version"
+fi
 
 #libdir suffix
 readWithDefault "LIBDIRSUFFIX" "Enter Suffix For Lib Folders"
@@ -151,6 +167,8 @@ readWithDefault "QT5PREFIX" "Qt5 Install Location"
 echo "----SUMMARY----"
 echo 
 echo "LFSVERSION=$LFSVERSION"
+echo "PIBUILD=$PIBUILD"
+echo "PIVERS=$PIVERS"
 
 echo "LIBDIRSUFFIX=$LIBDIRSUFFIX"
 echo "BUILDSCRIPTS=$BUILDSCRIPTS"
@@ -182,6 +200,8 @@ fi
 
 cat > /etc/lfspkg.rc << EOF
 LFSVERSION=$LFSVERSION
+PIBUILD=$PIBUILD
+PIVERS=$PIVERS
 LIBDIRSUFFIX=$LIBDIRSUFFIX
 BUILDSCRIPTS="$BUILDSCRIPTS"
 OUTPUT="$OUTPUT"
