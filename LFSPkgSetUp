@@ -117,7 +117,7 @@ readWithDefault "BUILDSCRIPTS" "Enter Folder For Build Scripts"
 
 #Folder for built pkgs
 OUTPUT=${OUTPUT:-"/LFSBuiltPackages/$LFSVERSION"}
-readWithDefault "OUTPUT" "Enter Folder Temporary Files"
+readWithDefault "OUTPUT" "Enter Folder For Temporary Files"
 
 #Place to store downloaded source archives, defaults to /LFSSourceArchives/${LFSVERSION}
 SOURCEARCHIVES=${SOURCEARCHIVES:-"/LFSSourceArchives/${LFSVERSION}"}
