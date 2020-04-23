@@ -345,9 +345,10 @@ installlfspkg ()
 
 makelfspkg ()
 {
-	local tarfile="${OUTPUT}/${SECTION}/${NAME}-${PKGVERSION}-${BUILD}_${SECTION}_${SUFFIX}.tar.gz"
+	local outdir="${PKGARCHIVES:-"$OUTPUT"}"
+	local tarfile="${PKGARCHIVES}/${SECTION}/${NAME}-${PKGVERSION}-${BUILD}_${SECTION}_${SUFFIX}.tar.gz"
 
-	mkdir -vp "${OUTPUT}/${SECTION}" 2>/dev/null||true
+	mkdir -vp "${PKGARCHIVES}/${SECTION}" 2>/dev/null||true
 
 	tar -cvzf "$tarfile" .
 	echo "Package ${NAME}-${PKGVERSION} has been built here:$tarfile"
@@ -404,7 +405,7 @@ updatelfspkg ()
 				done < <(cat /tmp/old.$$)
 		popd
 		if [ ! "$(basename ${newpkg%-?*})" = "${pkgfolder}" ];then
-			rm -rvf /var/lib/lfspkg/packages/${pkgfolder}
+			rm -rvf ${ROOTDIR}/var/lib/lfspkg/packages/${pkgfolder}
 		fi
 		updatedatabase
 	fi
