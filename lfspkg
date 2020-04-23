@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Thu 23 Apr 12:16:04 BST 2020
+#Thu 23 Apr 13:43:24 BST 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -588,7 +588,6 @@ makelfspkg ()
 	tar -cvzf "$tarfile" .
 	echo "Package ${NAME}-${PKGVERSION} has been built here:$tarfile"
 	BUILTTARBALL="$tarfile"
-	return
 }
 
 updatelfspkg ()

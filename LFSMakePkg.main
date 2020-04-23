@@ -353,7 +353,6 @@ makelfspkg ()
 	tar -cvzf "$tarfile" .
 	echo "Package ${NAME}-${PKGVERSION} has been built here:$tarfile"
 	BUILTTARBALL="$tarfile"
-	return
 }
 
 updatelfspkg ()
