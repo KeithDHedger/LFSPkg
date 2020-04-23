@@ -107,6 +107,7 @@ sanitycheckfolder ()
 
 sanitycheck ()
 {
+#	mkdir -vp "$COMPILEAT" "$SOURCEARCHIVES" "$OUTPUT" &>/dev/null
 	if [ "$(sanitycheckfolder "$COMPILEAT")" = "NOTWRITABLE" ];then
 		echo "Can't write to $COMPILEAT defined by COMPILEAT"
 		stat -c "%U:%G %A" "$OUTPUT"
