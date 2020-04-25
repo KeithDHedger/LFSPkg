@@ -107,7 +107,7 @@ sanitycheckfolder ()
 
 sanitycheck ()
 {
-#	mkdir -vp "$COMPILEAT" "$SOURCEARCHIVES" "$OUTPUT" &>/dev/null
+	mkdir -vp "$COMPILEAT" "$SOURCEARCHIVES" "$OUTPUT" &>/dev/null
 	if [ "$(sanitycheckfolder "$COMPILEAT")" = "NOTWRITABLE" ];then
 		echo "Can't write to $COMPILEAT defined by COMPILEAT"
 		stat -c "%U:%G %A" "$OUTPUT"
@@ -734,22 +734,25 @@ extractarchive ()
 	local what=$2
 	local comm="tar -xvf"
 	local upname
+	local resetperms=1
 
 	case $what in
 		"zip")
+			resetperms=0
 			comm="unzip"
 			;;
 		*)
 			upname="${archive^^}"
 			if [ "${upname##?*.}" = "ZIP" ];then
+				resetperms=0
 				comm=unzip
 			fi
 			;;
 	esac
 
 	if [ $UID -eq 0 ];then
-		if [ "X$NOCHANGEUSER" = "X" ];then
-			su -m lfspkguser -c "( $comm "$archive" )"
+		if [ $resetperms -eq 1 ];then
+			perms=$(stat --format="%a" $(pwd));$comm "$archive";chmod $perms $(pwd)
 		else
 			$comm "$archive"
 		fi

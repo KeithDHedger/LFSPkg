@@ -1,4 +1,5 @@
 0.4.23
+Removed lfspkguser code.
 Tweaks for Pi4.
 Running  lfspkg --setup now needs to be run as root.
 Tweaks to defaults in lfspkg.rc and LFSPkgSetUp.
