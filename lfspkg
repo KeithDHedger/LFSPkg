@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun 10 May 13:47:00 BST 2020
+#Tue 11 Aug 14:53:01 BST 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -762,7 +762,7 @@ EOF
 	packageclean "\$PKG" "\$CWD"
 
 	pushd "\$PKG"
-		/usr/bin/lfspkg -n "\$PKGNAME" -p "\$VERSION" -d \$SECTION -b \$BUILD -s \$SUFFIX -m
+		lfspkg -n "\$PKGNAME" -p "\$VERSION" -d \$SECTION -b \$BUILD -s \$SUFFIX -m
 	popd
 
 	case \$DOWHAT in
