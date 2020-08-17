@@ -437,7 +437,7 @@ maketemplate ()
 			echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${lfsname}/postinstall
 			infodata=$(makepkginfo ${lfsname}||true)
 			if [ "X$infodata" != X ];then
-				echo $infodata > ${lfsname}/info
+				echo "$infodata" > ${lfsname}/info
 			fi
 			cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
 #!/bin/bash -e

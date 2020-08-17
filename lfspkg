@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon 17 Aug 13:22:56 BST 2020
+#Mon 17 Aug 13:31:58 BST 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -672,7 +672,7 @@ maketemplate ()
 			echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${lfsname}/postinstall
 			infodata=$(makepkginfo ${lfsname}||true)
 			if [ "X$infodata" != X ];then
-				echo $infodata > ${lfsname}/info
+				echo "$infodata" > ${lfsname}/info
 			fi
 			cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
 #!/bin/bash -e
@@ -700,7 +700,7 @@ gettar "${pkgdir}/\${TARBALL}" \$SECTION
 rm -rf "\$PKG" || true
 mkdir -p "\$PKG"
 
-if [ $USESYSTEMD -eq 0 ];then
+if [ \$USESYSTEMD -eq 0 ];then
 	:
 fi
 
