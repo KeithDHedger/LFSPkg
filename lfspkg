@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sat 15 Aug 15:00:26 BST 2020
+#Mon 17 Aug 13:22:56 BST 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -699,6 +699,10 @@ scriptLog "\${PKGNAME}-\${VERSION}"
 gettar "${pkgdir}/\${TARBALL}" \$SECTION
 rm -rf "\$PKG" || true
 mkdir -p "\$PKG"
+
+if [ $USESYSTEMD -eq 0 ];then
+	:
+fi
 
 pushd \$COMPILEAT 2>/dev/null||true
 	extractarchive "\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}"

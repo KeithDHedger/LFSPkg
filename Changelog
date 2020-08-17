@@ -1,4 +1,5 @@
 0.4.23
+Minor update to template file for systemd usage.
 Prevented make install overwriting existing config file.
 Removed lfspkguser code.
 Tweaks for Pi4.

@@ -465,6 +465,10 @@ gettar "${pkgdir}/\${TARBALL}" \$SECTION
 rm -rf "\$PKG" || true
 mkdir -p "\$PKG"
 
+if [ $USESYSTEMD -eq 0 ];then
+	:
+fi
+
 pushd \$COMPILEAT 2>/dev/null||true
 	extractarchive "\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}"
 	pushd "\${TARNAME}-\${VERSION}"
