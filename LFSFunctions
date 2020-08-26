@@ -721,15 +721,15 @@ packageclean ()
 	fi
 
 	pushd "$pkgname"
-		find "$pkgname" -iname "*.la" -exec rm '{}' \;
+		find "$pkgname" -iname "*.la" -exec rm '{}' \; || true
 		find | xargs file | grep -e "executable" -e "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 		rm -rf tmp
 		if [ ${DELETEDOCS:-0} -eq 1 ];then
-			find usr/share/locale/ -maxdepth 1 -mindepth 1 -type d -not -iname "${LANG%_?*}*" -exec rm -rf '{}' \;
-			find usr/share/doc -delete
-			find usr/share/man -delete
-			find usr/share/info -delete
-			find usr/share/gtk-doc -delete
+			find usr/share/locale/ -maxdepth 1 -mindepth 1 -type d -not -iname "${LANG%_?*}*" -exec rm -rf '{}' \; || true
+			find usr/share/doc -delete || true
+			find usr/share/man -delete || true
+			find usr/share/info -delete || true
+			find usr/share/gtk-doc -delete || true
 		fi
 	popd
 	ldconfig||true
