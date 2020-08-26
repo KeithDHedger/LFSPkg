@@ -25,7 +25,7 @@ install:
 	cp -n $(RCFILE) $(DESTDIR)/etc/$(RCFILE)
 
 	@echo "**************************************************************"
-	@echo "Now set your package options in the file ~/lfspkg.rc"
+	@echo "Now set your package options in the file /etc/lfspkg.rc"
 	@echo "Either manually or by using 'lfspkg --setup'"
 	@echo "An example rc file is included in $(PREFIX)/share/$(PKGNAME)"
 	@echo 

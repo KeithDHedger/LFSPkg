@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon 17 Aug 13:31:58 BST 2020
+#Wed 26 Aug 14:33:42 BST 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -217,12 +217,13 @@ do
 			echo "-Y|--dryrun : Just print what would be done"
 			echo -e "
 Some Important Envirronment Variables:
-CHECKETC 0=Don't check for possible config files, 1=check.
-NODOWNLOAD 0=download tarball, 1=Don't download tarball.
+CHECKETC=0 Don't check for possible config files, 1=check.
+NODOWNLOAD=0 Download tarball, 1=Don't download tarball.
 FORCEDOWNLOAD !='' Remove old tarball before downloading.
 NODEPS !='' Don't build dependencies.
 ANYVERSION !='' Ignore version
-SIMPLEUPDATE 0=Full update of db, 1=Only update as needed.
+SIMPLEUPDATE=0 Full update of db, 1=Only update as needed.
+DELETEDOCS=1 Try to Remove as much documentaion as possible.
 "
 			exit 0
 			;;
