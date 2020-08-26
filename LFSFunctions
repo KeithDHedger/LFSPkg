@@ -728,6 +728,8 @@ packageclean ()
 			find usr/share/locale/ -maxdepth 1 -mindepth 1 -type d -not -iname "${LANG%_?*}*" -exec rm -rf '{}' \;
 			find usr/share/doc -delete
 			find usr/share/man -delete
+			find usr/share/info -delete
+			find usr/share/gtk-doc -delete
 		fi
 	popd
 	ldconfig||true
