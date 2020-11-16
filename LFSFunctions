@@ -78,6 +78,7 @@ fi
 TMP=${TMP:-/tmp/LFS}
 OUTPUT=${OUTPUT:-$TMP}
 PKGARCHIVES=${PKGARCHIVES:-$OUTPUT}
+USEROPTIONS=${USEROPTIONS:-"/etc/pkgoptions"}
 #XORG_PREFIX=${XORG_PREFIX:-/usr}
 #if [ ! -d "$TMP" ];then mkdir -p "$TMP" &>/dev/null;fi
 #if [ ! -d "$OUTPUT" ];then mkdir -p "$OUTPUT" &>/dev/null ||true;fi
@@ -85,6 +86,17 @@ PKGARCHIVES=${PKGARCHIVES:-$OUTPUT}
 #if [ ! -d "$XORG_PREFIX" ];then mkdir -p "$XORG_PREFIX" &>/dev/null ||true;fi
 
 #export TMP OUTPUT XORG_PREFIX
+
+checkforoptions ()
+{
+	if [ -e "${USEROPTIONS}/${PKGNAME}.options" ];then
+		. "${USEROPTIONS}/${PKGNAME}.options"
+	else
+		if [ -e "${CWD}/${PKGNAME}.options" ];then
+			. "${CWD}/${PKGNAME}.options"
+		fi
+	fi
+}
 
 sanitycheckfolder ()
 {
