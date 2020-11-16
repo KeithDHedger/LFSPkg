@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon 16 Nov 13:27:15 GMT 2020
+#Mon 16 Nov 14:09:36 GMT 2020
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -430,6 +430,11 @@ selectsinglepkg ()
 	local nodialogarray pkg
 	local searchname="$2"
 	local transform
+
+	if [ -z "$searchname" ];then
+		echo "Please provide package name ..."
+		exit 100
+	fi
 
 	arraydata=$(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i $searchname|sort)
 	if [ ${#arraydata} -eq 0 ];then

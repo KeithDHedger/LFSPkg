@@ -192,6 +192,11 @@ selectsinglepkg ()
 	local searchname="$2"
 	local transform
 
+	if [ -z "$searchname" ];then
+		echo "Please provide package name ..."
+		exit 100
+	fi
+
 	arraydata=$(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i $searchname|sort)
 	if [ ${#arraydata} -eq 0 ];then
 		echo "Nothing by that name :("
