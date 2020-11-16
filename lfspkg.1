@@ -1,4 +1,4 @@
-.TH "LFSPkg" "1" "0.4.22" "K.D.Hedger" ""
+.TH "LFSPkg" "1" "0.4.23" "K.D.Hedger" ""
 .SH "NAME"
 \fBlfspkg\fR - A package manager for Linux From Scratch
 .br
@@ -46,7 +46,7 @@ This is a source based package manager and dependencies can be checked for and b
 .br
 	Create LFSBuild template for source tarball \fI[URL]\fR.
 .br
-	ARG can be any one of configure, cmake, python. python2 or python3.
+	ARG can be any one of configure, cmake, meson, perl, python, python2 or python3.
 .br
 	Python will build for BOTH python 2 and 3.
 .br
@@ -209,17 +209,23 @@ This is a source based package manager and dependencies can be checked for and b
 
 /etc\fI/lfspkg.rc\fR
 .br
-	Local config file, can contain the following:
+	Global config file, can contain the following:
+.br
+	LFSVERSION=9.0
 .br
 	OUTPUT=${OUTPUT:-/tmp/LFS}
 .br
 	SOURCEARCHIVES=${SOURCEARCHIVES:-/tmp/LFSSourceArchives}
+.br
+	PKGARCHIVES="/LFSBuiltPackages/9.0"
 .br
 	BUILDSCRIPTS=${BUILDSCRIPTS:-"/LFSPkgBuildScripts/"}
 .br
 	EXITONFAIL=${EXITONFAIL:-1}
 .br
 	CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
+.br
+	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --buildtype=release --default-library=shared"
 .br
 	CHECKETC=${CHECKETC:-1}
 .br
@@ -231,20 +237,34 @@ This is a source based package manager and dependencies can be checked for and b
 .br
 	JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
 .br
+	LIBDIRSUFFIX=64
+.br
+	USESYSTEMD=0
+.br
+	PIBUILD=0
+.br
+	PIVERS=4
+.br
 
 	Where:
 .br
 	TMP is the location for tempory files ( defaults to /tmp if not set )
 .br
+	LFSVERSION Build version of LFS.
+.br
 	OUTPUT is the location to save built packages ( defaults to /tmp if not set )
 .br
 	SOURCEARCHIVES is the location to store downloaded source archives.
+.br
+	PKGARCHIVES Path to folder to save built packages.
 .br
 	BUILDSCRIPTS location of the folder containg the build scripts.
 .br
 	EXITONFAIL Abort on first error if set to 1 or continue if unset or set any other value.
 .br
 	CONFIGOPTIONS Basic configure options.
+.br
+	MESONCONFIGOPTIONS Basic configure options for meson.
 .br
 	CHECKETC Check if there maybe files to go in /etc that are probably config files.
 .br
@@ -255,6 +275,16 @@ This is a source based package manager and dependencies can be checked for and b
 	XORG_CONFIG Basic configure options for building xorg.
 .br
 	JAVA_HOME go on guess!
+.br
+	LIBDIRSUFFIX Suffix for /usr/lib, lib ( Usually 64 or nothing ).
+.br
+	 
+.br
+	USESYSTEMD 1 or 0 ,Some scripts use this flag to set/unset extra options.
+.br
+	PIBUILD 1 or 0 Build for RPi.
+.br
+	PIVERS Rpi version 1/2/3/4 ( only 3/4 tested ).
 .br
 
 \fI/var/lib/LFSPackages\fR
@@ -361,6 +391,24 @@ Find dependencies for package with the ROOTDIR set to /media/Zen:
 		Build Scripts:
 .br
 		/media/SkyNet/ZenSingleBuilds/NET/openssl.LFSBuild
+.br
+.SH "ENVIRONMENT"
+Some useful environment variables:
+.br
+
+CHECKETC=0 Don't check for possible config files, 1=check.
+.br
+NODOWNLOAD=0 Download tarball, 1=Don't download tarball.
+.br
+FORCEDOWNLOAD !='' Remove old tarball before downloading.
+.br
+NODEPS !='' Don't build dependencies.
+.br
+ANYVERSION !='' Ignore version
+.br
+SIMPLEUPDATE=0 Full update of db, 1=Only update as needed.
+.br
+DELETEDOCS=1 Try to Remove as much documentaion as possible.
 .br
 .SH "AUTHOR"
 K.D.Hedger keithdhedger@gmail.com

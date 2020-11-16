@@ -1,4 +1,6 @@
 0.4.23
+Tweaked documentation.
+Added perl to template.
 Minor update to template file for systemd usage.
 Prevented make install overwriting existing config file.
 Removed lfspkguser code.

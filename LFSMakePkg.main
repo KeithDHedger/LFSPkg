@@ -522,6 +522,14 @@ EOF
 		python3 setup.py install --optimize=1 --root=\$PKG||exit 100
 EOF
 					;;
+
+				"PERL")
+					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
+		perl Makefile.PL
+		make \$MAKEFLAGS||make|| exit 100
+		make install DESTDIR=\$PKG || exit 100
+EOF
+			
 			esac
 
 			cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
