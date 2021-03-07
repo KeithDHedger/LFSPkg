@@ -783,3 +783,6 @@ extractarchive ()
 
 }
 
+searchinfos ()
+{
+}
