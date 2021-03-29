@@ -502,7 +502,7 @@ EOF
 					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
 		mkdir build || true
 		cd  build
-		cmake \$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEUSEQT5 \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev ..
+		cmake \$CMAKEOPTIONS ..
 		make \$MAKEFLAGS||make|| exit 100
 		make install DESTDIR=\$PKG || exit 100
 EOF
