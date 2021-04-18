@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Mon 29 Mar 13:21:55 BST 2021
+#Sun 18 Apr 14:40:34 BST 2021
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -687,6 +687,8 @@ maketemplate ()
 #!/bin/bash -e
 
 . /usr/share/LFSPkg/LFSFunctions
+
+trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
 
 DEPENDS=""
 if ! lfspkg -B "\$DEPENDS";then

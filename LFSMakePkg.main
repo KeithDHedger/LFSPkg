@@ -449,6 +449,8 @@ maketemplate ()
 
 . /usr/share/LFSPkg/LFSFunctions
 
+trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
+
 DEPENDS=""
 if ! lfspkg -B "\$DEPENDS";then
 	exit 100
