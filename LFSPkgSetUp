@@ -144,6 +144,19 @@ readWithDefault "SCRIPTLOG" "Log Output From Scripts, 0 = Don't Log"
 CHECKETC=${CHECKETC:-1}
 readWithDefault "CHECKETC" "Check /etc For Possible Config File Clashes, 0 = No Check"
 
+#qt5 and cmake stuff
+QT5PREFIX=${QT5PREFIX:-"/usr"}
+readWithDefault "QT5PREFIX" "Qt5 Install Location"
+QT5DIR=\$QT5PREFIX/lib${LIBDIRSUFFIX}/qt5
+
+#xorg prefix
+XORG_PREFIX=${XORG_PREFIX:-"/usr"}
+readWithDefault "XORG_PREFIX" "Build Locattion For Xorg"
+
+#java home
+JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
+readWithDefault "JAVA_HOME" "Java Install Location"
+
 #general config options
 CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
 readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
@@ -152,27 +165,17 @@ readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
 MESONCONFIGOPTIONS=${MESONCONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"}
 readWithDefault "MESONCONFIGOPTIONS" "Enter Basic Options For \"meson\" Scripts"
 
-#general purpose make flags
-MAKEFLAGS=${MAKEFLAGS:-" -j$(nproc) "}
-readWithDefault "MAKEFLAGS" "General Purpose Switches To Make"
-
-#xorg prefix
-XORG_PREFIX=${XORG_PREFIX:-"/usr"}
-oldprefix=$XORG_PREFIX
-readWithDefault "XORG_PREFIX" "Build Locattion For Xorg"
+#cmake config
+CMAKECONFIGOPTIONS=${CMAKECONFIGOPTIONS:-"-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/cmake -DLIB_SUFFIX=${LIBDIRSUFFIX} -DUSE_QT5=TRUE -DCMAKE_EXE_LINKER_FLAGS=-L/usr/lib${LIBDIRSUFFIX}/qt5 -DCMAKE_BUILD_TYPE=\"Release\" -Wno-dev"}
+readWithDefault "CMAKECONFIGOPTIONS" "Enter Basic Options For \"cmake\" Scripts"
 
 #xorg configure options
 XORG_CONFIG=${XORG_CONFIG:-"--prefix=$XORG_PREFIX --sysconfdir=/etc --mandir=$XORG_PREFIX/share/man --localstatedir=/var --disable-static"}
-XORG_CONFIG=${XORG_CONFIG//$oldprefix/$XORG_PREFIX}
 readWithDefault "XORG_CONFIG" "Xorg Configure Options"
 
-#java home
-JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
-readWithDefault "JAVA_HOME" "Java Install Location"
-
-#qt5 and cmake stuff
-QT5PREFIX=${QT5PREFIX:-"/usr"}
-readWithDefault "QT5PREFIX" "Qt5 Install Location"
+#general purpose make flags
+MAKEFLAGS=${MAKEFLAGS:-" -j$(nproc) "}
+readWithDefault "MAKEFLAGS" "General Purpose Switches To Make"
 
 echo "----SUMMARY----"
 echo 
@@ -190,17 +193,17 @@ echo "COMPILEAT=$COMPILEAT"
 echo "SCRIPTLOG=$SCRIPTLOG"
 echo "CHECKETC=$CHECKETC"
 echo
+echo "XORG_PREFIX=$XORG_PREFIX"
+echo "QT5PREFIX=$QT5PREFIX"
+echo "JAVA_HOME=$JAVA_HOME"
+echo
 echo "CONFIGOPTIONS=$CONFIGOPTIONS"
 echo "MESONCONFIGOPTIONS=$MESONCONFIGOPTIONS"
+echo "CMAKECONFIGOPTIONS=$CMAKECONFIGOPTIONS"
+echo "XORG_CONFIG=$XORG_CONFIG"
 echo
 echo "MAKEFLAGS=$MAKEFLAGS"
 echo
-echo "XORG_PREFIX=$XORG_PREFIX"
-echo "XORG_CONFIG=$XORG_CONFIG"
-echo
-echo "JAVA_HOME=$JAVA_HOME"
-echo "QT5PREFIX=$QT5PREFIX"
-
 echo "--------"
 
 SUMMARY="n"
@@ -226,36 +229,17 @@ CHECKETC=$CHECKETC
 
 CONFIGOPTIONS="$CONFIGOPTIONS"
 MESONCONFIGOPTIONS="$MESONCONFIGOPTIONS"
+CMAKEOPTIONS="$CMAKEOPTIONS"
+XORG_CONFIG="$XORG_CONFIG"
 
 MAKEFLAGS="$MAKEFLAGS"
 
-XORG_PREFIX="$XORG_PREFIX"
-XORG_CONFIG="$XORG_CONFIG"
+export QT5PREFIX=$QT5PREFIX
+export QT5DIR=\$QT5PREFIX/lib${LIBDIRSUFFIX}/qt5
+export XORG_PREFIX="$XORG_PREFIX"
+exportJAVA_HOME=$JAVA_HOME
 
-JAVA_HOME=$JAVA_HOME
-
-QT5PREFIX=$QT5PREFIX
-QT5DIR=\$QT5PREFIX/lib64/qt5
-CMAKE_INSTALL_PREFIX=\$QT5PREFIX
-CMAKE_PREFIX_PATH=\$QT5DIR/cmake
-PATH="\${QT5DIR}:\${PATH}"
-
-DEFLIBSUFFIX=\$LIBDIRSUFFIX
-DEFUSEQT5=TRUE
-DEFCMAKELINKERFLAGS="-L\$QT5DIR"
-
-CMAKEINSTALLPREFIX="-DCMAKE_INSTALL_PREFIX=\$CMAKE_INSTALL_PREFIX"
-CMAKEPREFIXPATH="-DCMAKE_PREFIX_PATH=\$CMAKE_PREFIX_PATH"
-CMAKELIBDIRSUFFIX="-DLIB_SUFFIX=\$DEFLIBSUFFIX"
-CMAKEUSEQT5="-DUSE_QT5=\$DEFUSEQT5"
-CMAKELDFLAGS="-DCMAKE_EXE_LINKER_FLAGS=\$DEFCMAKELINKERFLAGS"
-
-CMAKEOPTIONS="\$CMAKEINSTALLPREFIX \$CMAKELIBDIRSUFFIX \$CMAKEPREFIXPATH \$CMAKEBUILDTYPE -Wno-dev"
-
-export CMAKE_PREFIX_PATH
-export CMAKE_INSTALL_PREFIX
-export PATH
-export QT5DIR
+export PATH="\${QT5DIR}:\${PATH}"
 
 EOF
 
