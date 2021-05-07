@@ -55,49 +55,32 @@ esac
 if [ -e /etc/lfspkg.rc ];then
 	. /etc/lfspkg.rc
 else
-	LFSVERSION=$LOCALLFSVERSION
-	PIBUILD=$PIBUILD
-	PIVERS=$PIVERS
-	USESYSTEMD=$USESYSTEMD
-
-	LIBDIRSUFFIX=
-	BUILDSCRIPTS=/LFSPkgBuildScripts/
-	OUTPUT=LFSBuiltPackages/$LOCALLFSVERSION
-	SOURCEARCHIVES=/LFSSourceArchives/$LOCALLFSVERSION
-	PKGARCHIVES=/LFSBuiltPackages/$LOCALLFSVERSION
-	COMPILEAT=/LFSBuiltPackages/$LOCALLFSVERSION
+	LFSVERSION=9.0
+	PIBUILD=0
+	PIVERS=4
+	USESYSTEMD=0
+	LIBDIRSUFFIX=64
+	BUILDSCRIPTS="/LFSPkgBuildScripts/"
+	OUTPUT="/LFSBuiltPackages/9.0"
+	SOURCEARCHIVES="/LFSSourceArchives/9.0"
+	PKGARCHIVES="/LFSBuiltPackages/9.0"
+	COMPILEAT="/LFSSourceArchives/9.0"
 	SCRIPTLOG=1
-
-	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --enable-gtk-doc --disable-debug --disable-nls --disable-static"
-	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib$LIBDIRSUFFIX --buildtype=release --default-library=shared"
 	CHECKETC=1
-	MAKEFLAGS="-j1"
 
-	XORG_PREFIX=/usr
+	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --disable-nls --disable-static"
+	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --buildtype=release --default-library=shared"
+	CMAKEOPTIONS="-DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64 -DCMAKE_PREFIX_PATH=/usr/lib64/qt5/cmake -DUSE_QT5=TRUE  -Wno-dev"
 	XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static"
 
-	JAVA_HOME="/opt/jdk"
-	#qt5 and cmake stuff
-	QT5PREFIX="/usr"
-	QT5DIR=$QT5PREFIX/lib${LIBDIRSUFFIX}/qt5
-	CMAKE_INSTALL_PREFIX="$QT5PREFIX"
-	CMAKE_PREFIX_PATH=$QT5DIR/cmake
-	PATH="${QT5DIR}:${PATH}"
+	MAKEFLAGS="-j$(($(nproc)-1))"
 
-	DEFLIBSUFFIX=$LIBDIRSUFFIX
-	DEFUSEQT5=TRUE
-	DEFCMAKELINKERFLAGS="-L$QT5DIR"
+	export QT5PREFIX=/usr
+	export QT5DIR=$QT5DIR
+	export XORG_PREFIX="/usr"
+	exportJAVA_HOME=/opt/jdk
 
-	CMAKEINSTALLPREFIX="-DCMAKE_INSTALL_PREFIX=$CMAKE_INSTALL_PREFIX"
-	CMAKEPREFIXPATH="-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
-	CMAKELIBDIRSUFFIX="-DLIB_SUFFIX=$DEFLIBSUFFIX"
-	CMAKEUSEQT5="-DUSE_QT5=$DEFUSEQT5"
-	CMAKELDFLAGS="-DCMAKE_EXE_LINKER_FLAGS=$DEFCMAKELINKERFLAGS"
-
-	export CMAKE_PREFIX_PATH
-	export CMAKE_INSTALL_PREFIX
-	export PATH
-	export QT5DIR
+	export PATH="${QT5DIR}:${PATH}"
 fi
 
 #LFS Version
@@ -207,14 +190,15 @@ echo "MAKEFLAGS=$MAKEFLAGS"
 echo
 echo "--------"
 
-SUMMARY="n"
+SUMMARY="N/y"
 readWithDefault "SUMMARY"  "Write Config Files?"
 
-if [ $SUMMARY = "n" ];then
+if [ ! ${SUMMARY,,} = "y" ];then
 	exit 1
 fi
 
-cat > /etc/lfspkg.rc << EOF
+if [ $UID -eq 0 ];then
+	cat > /etc/lfspkg.rc << EOF
 LFSVERSION=$LFSVERSION
 PIBUILD=$PIBUILD
 PIVERS=$PIVERS
@@ -238,9 +222,39 @@ MAKEFLAGS="$MAKEFLAGS"
 export QT5PREFIX=$QT5PREFIX
 export QT5DIR=\$QT5DIR
 export XORG_PREFIX="$XORG_PREFIX"
-exportJAVA_HOME=$JAVA_HOME
+export JAVA_HOME=$JAVA_HOME
 
 export PATH="\${QT5DIR}:\${PATH}"
 
 EOF
+else
+	cat << EOF
+LFSVERSION=$LFSVERSION
+PIBUILD=$PIBUILD
+PIVERS=$PIVERS
+USESYSTEMD=$USESYSTEMD
+LIBDIRSUFFIX=$LIBDIRSUFFIX
+BUILDSCRIPTS="$BUILDSCRIPTS"
+OUTPUT="$OUTPUT"
+SOURCEARCHIVES="$SOURCEARCHIVES"
+PKGARCHIVES="$PKGARCHIVES"
+COMPILEAT=$COMPILEAT
+SCRIPTLOG=$SCRIPTLOG
+CHECKETC=$CHECKETC
 
+CONFIGOPTIONS="$CONFIGOPTIONS"
+MESONCONFIGOPTIONS="$MESONCONFIGOPTIONS"
+CMAKEOPTIONS="$CMAKEOPTIONS"
+XORG_CONFIG="$XORG_CONFIG"
+
+MAKEFLAGS="$MAKEFLAGS"
+
+export QT5PREFIX=$QT5PREFIX
+export QT5DIR=\$QT5DIR
+export XORG_PREFIX="$XORG_PREFIX"
+export JAVA_HOME=$JAVA_HOME
+
+export PATH="\${QT5DIR}:\${PATH}"
+
+EOF
+fi
