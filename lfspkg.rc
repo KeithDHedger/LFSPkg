@@ -3,22 +3,24 @@ PIBUILD=0
 PIVERS=4
 USESYSTEMD=0
 LIBDIRSUFFIX=64
-BUILDSCRIPTS=/LFSPkgBuildScripts/
-OUTPUT=/LFSBuiltPackages/9.0
-SOURCEARCHIVES=/LFSSourceArchives/9.0
-PKGARCHIVES=/LFSBuiltPackages/9.0
+BUILDSCRIPTS="/LFSPkgBuildScripts/"
+OUTPUT="/LFSBuiltPackages/9.0"
+SOURCEARCHIVES="/LFSSourceArchives/9.0"
+PKGARCHIVES="/LFSBuiltPackages/9.0"
 COMPILEAT=/LFSSourceArchives/9.0
 SCRIPTLOG=1
 CHECKETC=1
 
-XORG_PREFIX=/usr
-QT5PREFIX=/usr
-QT5DIR=/usr/lib64/qt5
-JAVA_HOME=/opt/jdk
+CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --disable-nls --disable-static"
+MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --buildtype=release --default-library=shared"
+CMAKEOPTIONS="-DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64 -DCMAKE_PREFIX_PATH=/usr/lib64/qt5/cmake -DUSE_QT5=TRUE  -Wno-dev"
+XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static"
 
-CONFIGOPTIONS=--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --disable-nls --disable-static
-MESONCONFIGOPTIONS=--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --buildtype=release --default-library=shared
-CMAKECONFIGOPTIONS=-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib64/cmake -DLIB_SUFFIX=64 -DUSE_QT5=TRUE -DCMAKE_EXE_LINKER_FLAGS=-L/usr/lib64/qt5 -DCMAKE_BUILD_TYPE="Release" -Wno-dev
-XORG_CONFIG=--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static
+MAKEFLAGS="-j3"
 
-MAKEFLAGS=-j3
+export QT5PREFIX=/usr
+export QT5DIR=$QT5DIR
+export XORG_PREFIX="/usr"
+export JAVA_HOME=/opt/jdk
+
+export PATH="${QT5DIR}:${PATH}"
