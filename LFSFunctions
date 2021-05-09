@@ -155,6 +155,7 @@ scriptLog ()
 			timestr=""
 		fi
 		mkdir -p "$LOGDIR" &>/dev/null||true
+		ln -svfn  ..${LOGDIR}/${1}${timestr}.log /tmp/CURRENTLOG
 		exec > >(tee -ia "${LOGDIR}/${1}${timestr}.log")
 	fi
 }
