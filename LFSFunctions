@@ -792,17 +792,23 @@ printBuildInfo ()
 
 	find $ROOTDIR/var/lib/lfspkg/packages/ -type d -iname "${1}*"|while read
 		do
-			echo -e "${GREEN}Pkg Info${NORMAL}"
+			echo -e "${GREEN}Pkg info for $(basename ${REPLY})${NORMAL}"
 			cat $REPLY/info 2>/dev/null||true
-			echo
-			echo -e "${GREEN}Pre Install${NORMAL}"
-			cat $REPLY/preinstall 2>/dev/null||true
-			echo
-			echo -e "${GREEN}Post Install${NORMAL}"
-			cat $REPLY/postinstall 2>/dev/null||true
-			echo
-			echo -e "${GREEN}Build Script${NORMAL}"
-			cat $REPLY/buildscript.txt 2>/dev/null||true
+			if [ -e $REPLY/preinstall ];then
+				echo
+				echo -e "${GREEN}Pre Install${NORMAL}"
+				cat $REPLY/preinstall 2>/dev/null||true
+			fi
+			if [ -e $REPLY/postinstall ];then
+				echo
+				echo -e "${GREEN}Post Install${NORMAL}"
+				cat $REPLY/postinstall 2>/dev/null||true
+			fi
+			if [ -e $REPLY/buildscript.txt ];then
+				echo
+				echo -e "${GREEN}Build Script${NORMAL}"
+				cat $REPLY/buildscript.txt 2>/dev/null||true
+			fi
 			echo
 		done
 }
