@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Wed 20 Oct 14:42:37 BST 2021
+#Wed 20 Oct 16:43:07 BST 2021
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -18,104 +18,92 @@ lfspkgargs ()
 APPNAME="lfspkg"
 VERSION="0.4.24"
 
-COMMIT=0
-INSTALL=0
-MAKE=0
-UPGRADE=0
-REMOVE=0
-TEMPLATE=""
-LIST=0
-FIND=""
-LESS=0
-REMAKE=0
-BUILDDEPS=""
-FINDDEPENDS=""
-JUSTLIST=0
-PREINSTALL=0
 POSTINSTALL=0
-INFO=""
-PKGINFO=0
+PREINSTALL=0
+BUILDDEPS=""
 CHECK=0
-REBUILD=0
-NOTINSTALLED=0
+COMMIT=0
+PKGINFO=0
 INSTALLED=0
+FINDDEPENDS=""
+FIND=""
+INFO=""
+INSTALL=0
+JUSTLIST=0
+NOCOLOUR=0
+LESS=0
+LIST=0
+MAKE=0
+REMAKE=0
 DEPENDSON=0
 CHECKALL=0
-WEBPAGE=""
-NOCOLOUR=0
 SETUP=0
+REMOVE=0
+NOTINSTALLED=0
+TEMPLATE=""
+REBUILD=0
+UPGRADE=0
+WEBPAGE=""
+EXPLAIN=""
 
 while [ $# -gt 0 ]
 do
 	case "$1" in
 
-		-c|--commit)
-			COMMIT=1
+		-A|--postinstall)
+			POSTINSTALL=1
 			;;
-		-i|--install)
-			INSTALL=1
-			;;
-		-m|--make)
-			MAKE=1
-			;;
-		-u|--upgrade)
-			UPGRADE=1
-			;;
-		-r|--remove)
-			REMOVE=1
-			;;
-		-t|--template)
-			TEMPLATE="$2"
-			shift
-			;;
-		-l|--list)
-			LIST=1
-			;;
-		-f|--find)
-			FIND="$2"
-			shift
-			;;
-		-L|--less)
-			LESS=1
-			;;
-		-M|--remake)
-			REMAKE=1
+		-a|--preinstall)
+			PREINSTALL=1
 			;;
 		-B|--builddeps)
 			BUILDDEPS="$2"
 			shift
 			;;
+		-C|--check)
+			CHECK=1
+			;;
+		-c|--commit)
+			COMMIT=1
+			;;
+		-D|--pkginfo)
+			PKGINFO=1
+			;;
+		-E|--installed)
+			INSTALLED=1
+			;;
 		-F|--finddepends)
 			FINDDEPENDS="$2"
 			shift
 			;;
-		-j|--justlist)
-			JUSTLIST=1
-			;;
-		-a|--preinstall)
-			PREINSTALL=1
-			;;
-		-A|--postinstall)
-			POSTINSTALL=1
+		-f|--find)
+			FIND="$2"
+			shift
 			;;
 		-I|--info)
 			INFO="$2"
 			shift
 			;;
-		-D|--pkginfo)
-			PKGINFO=1
+		-i|--install)
+			INSTALL=1
 			;;
-		-C|--check)
-			CHECK=1
+		-j|--justlist)
+			JUSTLIST=1
 			;;
-		-U|--rebuild)
-			REBUILD=1
+		-K|--nocolour)
+			NOCOLOUR=1
 			;;
-		-T|--notinstalled)
-			NOTINSTALLED=1
+		-L|--less)
+			LESS=1
 			;;
-		-E|--installed)
-			INSTALLED=1
+		-l|--list)
+			LIST=1
+			;;
+		-m|--make)
+			MAKE=1
+			;;
+		-M|--remake)
+			REMAKE=1
 			;;
 		-O|--dependson)
 			DEPENDSON=1
@@ -123,98 +111,116 @@ do
 		-P|--checkall)
 			CHECKALL=1
 			;;
+		-Q|--setup)
+			SETUP=1
+			;;
+		-r|--remove)
+			REMOVE=1
+			;;
+		-T|--notinstalled)
+			NOTINSTALLED=1
+			;;
+		-t|--template)
+			TEMPLATE="$2"
+			shift
+			;;
+		-U|--rebuild)
+			REBUILD=1
+			;;
+		-u|--upgrade)
+			UPGRADE=1
+			;;
 		-W|--webpage)
 			WEBPAGE="$2"
 			shift
 			;;
-		-K|--nocolour)
-			NOCOLOUR=1
-			;;
-		-Q|--setup)
-			SETUP=1
-			;;
-		-S|--search)
-			SEARCH="$2"
-			shift
-			;;
-		-Z|--fuzzy)
-			FUZZY="$2"
-			shift
-			;;
-		-N|--noaskroot)
-			NOASKROOT=1
-			;;
-		-R|--rootdir)
-			ROOTDIR="$2"
-			shift
-			;;
-		-s|--suffix)
-			SUFFIX="$2"
-			shift
-			;;
-		-d|--section)
-			SECTION="$2"
+		-x|--explain)
+			EXPLAIN="$2"
 			shift
 			;;
 		-b|--build)
 			BUILD="$2"
 			shift
 			;;
-		-o|--output)
-			OUTPUT="$2"
+		-d|--section)
+			SECTION="$2"
 			shift
 			;;
 		-n|--name)
 			NAME="$2"
 			shift
 			;;
+		-N|--noaskroot)
+			NOASKROOT=1
+			;;
+		-o|--output)
+			OUTPUT="$2"
+			shift
+			;;
 		-p|--pkgversion)
 			PKGVERSION="$2"
+			shift
+			;;
+		-R|--rootdir)
+			ROOTDIR="$2"
+			shift
+			;;
+		-S|--search)
+			SEARCH="$2"
+			shift
+			;;
+		-s|--suffix)
+			SUFFIX="$2"
 			shift
 			;;
 		-Y|--dryrun)
 			DRYRUN=1
 			;;
+		-Z|--fuzzy)
+			FUZZY="$2"
+			shift
+			;;
 		'-?'|--help|-h)
 			echo $APPNAME - Version $VERSION
 			echo "Useage: $APPNAME [option] ..."
-			echo "-c|--commit : Make and Install package"
-			echo "-i|--install : Install package"
-			echo "-m|--make : Make package"
-			echo "-u|--upgrade : Upgrade package"
-			echo "-r|--remove : Remove package"
-			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,meson,cmake,perl or python[2|3]"
-			echo "-l|--list : List installed files"
-			echo "-f|--find : Find installed file"
-			echo "-L|--less : Pipe output from list/find to less"
-			echo "-M|--remake : Re-consitute an installed package"
-			echo "-B|--builddeps : Build all dependant packages"
-			echo "-F|--finddepends : Find dependencies and build scripts."
-			echo "-j|--justlist : Just output list if query results in multiple packages"
-			echo "-a|--preinstall : Re-run the preinstall script for PKG"
 			echo "-A|--postinstall : Re-run the postinstall script for PKG"
-			echo "-I|--info : Try to make info file from lfs/blfs website"
-			echo "-D|--pkginfo : Print info for installed package"
+			echo "-a|--preinstall : Re-run the preinstall script for PKG"
+			echo "-B|--builddeps : Build all dependant packages"
 			echo "-C|--check : Try to check package version"
-			echo "-U|--rebuild : Re-build database"
-			echo "-T|--notinstalled : List packages not installed"
+			echo "-c|--commit : Make and Install package"
+			echo "-D|--pkginfo : Print info for installed package"
 			echo "-E|--installed : List installed packages"
+			echo "-F|--finddepends : Find dependencies and build scripts."
+			echo "-f|--find : Find installed file"
+			echo "-I|--info : Try to make info file from lfs/blfs website"
+			echo "-i|--install : Install package"
+			echo "-j|--justlist : Just output list if query results in multiple packages"
+			echo "-K|--nocolour : Use colour in output default=on"
+			echo "-L|--less : Pipe output from list/find to less"
+			echo "-l|--list : List installed files"
+			echo "-m|--make : Make package"
+			echo "-M|--remake : Re-consitute an installed package"
 			echo "-O|--dependson : Find packages that depend on ARG"
 			echo "-P|--checkall : Check all packages for possible upgrade"
-			echo "-W|--webpage : Try to find webpage for build"
-			echo "-K|--nocolour : Use colour in output default=on"
 			echo "-Q|--setup : Setup lfspkg.rc file"
-			echo "-S|--search : Search database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
-			echo "-Z|--fuzzy : Fuzzy search of database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
-			echo "-N|--noaskroot : Don't check for root user"
-			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
-			echo "-s|--suffix : Suffix of package"
-			echo "-d|--section : Section of package"
+			echo "-r|--remove : Remove package"
+			echo "-T|--notinstalled : List packages not installed"
+			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,meson,cmake,perl or python[2|3]"
+			echo "-U|--rebuild : Re-build database"
+			echo "-u|--upgrade : Upgrade package"
+			echo "-W|--webpage : Try to find webpage for build"
+			echo "-x|--explain : Print installed package info ( info/[pre|post]install script(s)/build script )"
 			echo "-b|--build : Build of package"
-			echo "-o|--output : Output archive to this folder"
+			echo "-d|--section : Section of package"
 			echo "-n|--name : Name of package"
+			echo "-N|--noaskroot : Don't check for root user"
+			echo "-o|--output : Output archive to this folder"
 			echo "-p|--pkgversion : Version of package"
+			echo "-R|--rootdir : use ROOTDIR as install/remove prefix"
+			echo "-S|--search : Search database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
+			echo "-s|--suffix : Suffix of package"
 			echo "-Y|--dryrun : Just print what would be done"
+			echo "-Z|--fuzzy : Fuzzy search of database PACKAGENAME DATANEEDED 0/nothing=all,1=name,2=script version,3=path,4=depends,5=installed,6=installed version"
 			echo -e "
 Some Important Envirronment Variables:
 CHECKETC=0 Don't check for possible config files, 1=check.
@@ -1145,6 +1151,11 @@ main ()
 
 	if [ $CHECKALL -eq 1 ];then
 		cat $DATABASE |grep -i name|awk -F= '{print $2}'|xargs -I '{}' lfspkg -C '{}'
+		return
+	fi
+
+	if [ "X$EXPLAIN" != "X" ];then
+		printBuildInfo "$EXPLAIN"
 		return
 	fi
 

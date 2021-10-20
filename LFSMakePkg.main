@@ -909,6 +909,11 @@ main ()
 		return
 	fi
 
+	if [ "X$EXPLAIN" != "X" ];then
+		printBuildInfo "$EXPLAIN"
+		return
+	fi
+
 	if [[ -n "${SEARCH+1}" ]] || [[ -n "${FUZZY+1}" ]];then
 		if [ ! -e "$DATABASE" ];then
 			lfspkg -U
