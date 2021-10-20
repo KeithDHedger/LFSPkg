@@ -1,6 +1,6 @@
 PROGRAM=lfspkg
 PREFIX=/usr
-VERSION=0.4.23
+VERSION=0.4.24
 CONF=LFSMakePkg.conf
 HELPER=finddepends
 HELPERCODE=main.cpp

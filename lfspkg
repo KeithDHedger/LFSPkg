@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Fri  7 May 14:07:33 BST 2021
+#Wed 20 Oct 14:14:22 BST 2021
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -16,7 +16,7 @@ lfspkgargs ()
 {
 
 APPNAME="lfspkg"
-VERSION="0.4.23"
+VERSION="0.4.24"
 
 COMMIT=0
 INSTALL=0
@@ -570,6 +570,7 @@ doinstall ()
 			mv $ROOTDIR/preinstall . &>/dev/null||true
 			mv $ROOTDIR/postinstall . &>/dev/null||true
 			mv $ROOTDIR/info . &>/dev/null||true
+			mv $ROOTDIR/buildscript.txt . &>/dev/null||true
 		popd
 	popd
 }

@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+#©keithhedger Mon 10 May 12:13:14 BST 2021 kdhedger68713@gmail.com
+
+CONFIGDIR="$(dirname $0)/deleteLocales.rc"
+LOCALEDIR="${LOCALEDIR:-/usr/share/locale}"
+KEEPLOCALES=${KEEPLOCALES:-"$(cat "$CONFIGDIR")"}
+RED='\e[1;31m'
+GREEN='\e[1;32m'
+NORMAL='\e[0;0m'
+
+while read
+	do
+		if [[ ! "$(basename $REPLY)" =~ ${KEEPLOCALES} ]];then
+			echo -e "${RED}Deleting ${GREEN}${REPLY}${NORMAL} ..."
+			if [ $UID -eq 0 ];then
+				rm -rf $REPLY
+			fi
+		fi		
+	done < <(find "$LOCALEDIR"  -maxdepth 1 -mindepth 1 -type d|sort)

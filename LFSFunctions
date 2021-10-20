@@ -720,6 +720,7 @@ packageclean ()
 {
 	local pkgname="$1"
 	local scriptfolder="${2:-.}"
+	local buildscript="${3,,}"
 
 	if [ -e "$scriptfolder/preinstall" ];then
 		cp "$scriptfolder/preinstall" "$pkgname"
@@ -732,6 +733,8 @@ packageclean ()
 	if [ -e "$scriptfolder/info" ];then
 		cp "$scriptfolder/info" "$pkgname"
 	fi
+
+	cp "${scriptfolder}/${buildscript}" "${pkgname}/buildscript.txt"
 
 	pushd "$pkgname"
 		find "$pkgname" -iname "*.la" -exec rm '{}' \; || true

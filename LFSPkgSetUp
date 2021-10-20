@@ -19,7 +19,7 @@
 # along with BootCD.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-LOCALLFSVERSION=9.0
+LOCALLFSVERSION=10.1
 PIBUILD=0
 PIVERS=4
 USESYSTEMD=0
@@ -61,10 +61,10 @@ else
 	USESYSTEMD=0
 	LIBDIRSUFFIX=64
 	BUILDSCRIPTS="/LFSPkgBuildScripts/"
-	OUTPUT="/LFSBuiltPackages/9.0"
-	SOURCEARCHIVES="/LFSSourceArchives/9.0"
-	PKGARCHIVES="/LFSBuiltPackages/9.0"
-	COMPILEAT="/LFSSourceArchives/9.0"
+	OUTPUT="/LFSBuiltPackages/10.1"
+	SOURCEARCHIVES="/LFSSourceArchives/10.1"
+	PKGARCHIVES="/LFSBuiltPackages/10.1"
+	COMPILEAT="/LFSSourceArchives/10.1"
 	SCRIPTLOG=1
 	CHECKETC=1
 
@@ -84,7 +84,7 @@ else
 fi
 
 #LFS Version
-LFSVERSION=${LFSVERSION:-"9.0"}
+LFSVERSION=${LFSVERSION:-"10.1"}
 readWithDefault "LFSVERSION" "Enter Version"
 
 #use systemd :(
