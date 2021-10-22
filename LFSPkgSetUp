@@ -223,9 +223,6 @@ export QT5PREFIX=$QT5PREFIX
 export QT5DIR=\$QT5DIR
 export XORG_PREFIX="$XORG_PREFIX"
 export JAVA_HOME=$JAVA_HOME
-
-export PATH="\${QT5DIR}:\${PATH}"
-
 EOF
 else
 	cat << EOF
@@ -253,8 +250,6 @@ export QT5PREFIX=$QT5PREFIX
 export QT5DIR=\$QT5DIR
 export XORG_PREFIX="$XORG_PREFIX"
 export JAVA_HOME=$JAVA_HOME
-
-export PATH="\${QT5DIR}:\${PATH}"
 
 EOF
 fi
