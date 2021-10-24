@@ -1,4 +1,5 @@
 0.4.23
+Fixed updating packages not removing orphaned files.
 Tweaked documentation.
 Added perl to template.
 Minor update to template file for systemd usage.

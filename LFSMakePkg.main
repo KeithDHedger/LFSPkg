@@ -369,20 +369,31 @@ updatelfspkg ()
 	local togo
 	local updated
 	local flag
+	local oldsearchname="${OPTS[0]}"
+	SELECTEDPKG=
 
 	selectsinglepkg "update" "$searchname"
+
 	if [ "X$SELECTEDPKG" = "X" ];then
 		return
+	else
+		x=$(basename "${SELECTEDPKG%-?*}")
+		searchname="${x%-?*}"
 	fi
+
+	if [ "$oldsearchname" != "$searchname" ];then
+		rm -rf /var/lib/lfspkg/packages/${oldsearchname}-*
+	fi
+	tar -Oxf /var/lib/lfspkg/packages/${searchname}-*/*_LFSPKG.tar.gz|sort -r >/tmp/old.$$
+	rm /var/lib/lfspkg/packages/${searchname}-*/*_LFSPKG.tar.gz
 
 	doinstall "$newpkg"
 	pkgfolder="$(basename "${SELECTEDPKG%-?*}")"
 	tar --list -f "$newpkg"|sort -r >/tmp/newp.$$
-	tar -Oxf /var/lib/lfspkg/packages/${pkgfolder}/*_LFSPKG.tar.gz|sort -r >/tmp/old.$$
 
 	echo -e "Removing orphaned files from ${GREEN}${pkgfolder}${NORMAL} From ${RED}${ROOTDIR}${NORMAL} ...\n" >&2
 	if [ $DRYRUN -eq 1 ];then
-		pushd $ROOTDIR
+		pushd $ROOTDIR &>/dev/null
 			while read togo
 				do
 					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
@@ -397,11 +408,11 @@ updatelfspkg ()
 		fi
 		echo -e "(Simultated) ${RED}updatedatabase${NORMAL}"
 	else
-		pushd $ROOTDIR
+		pushd $ROOTDIR &>/dev/null
 			while read togo
 				do
 					if [ "$(grep "^${togo}$" /tmp/newp.$$)" = "" ];then
-						if echo "$togo"|grep -i "/etc/" &>/dev/null;then
+						if echo "$togo"|grep -vi "/etc/" &>/dev/null;then
 							echo -e "Removing "${RED}${togo}${NORMAL}" ..."
 							rm -f "${togo}" &>/dev/null||true
 							rmdir "${togo}" &>/dev/null||true
@@ -414,7 +425,6 @@ updatelfspkg ()
 		fi
 		updatedatabase
 	fi
-
 	rm /tmp/newp.$$ /tmp/old.$$
 }
 
