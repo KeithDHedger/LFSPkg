@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun 24 Oct 15:09:27 BST 2021
+#Sun 30 Jan 14:49:56 GMT 2022
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -229,7 +229,7 @@ FORCEDOWNLOAD !='' Remove old tarball before downloading.
 NODEPS !='' Don't build dependencies.
 ANYVERSION !='' Ignore version
 USESYSTEMD see manpage
-SIMPLEUPDATE=0 Full update of db, 1=Only update as needed.
+SIMPLEUPDATE=0 Full update of db, 1=Only update as needed, 2=Don't update.
 DELETEDOCS=1 Try to Remove as much documentaion as possible.
 
 Please see the man page for full details!
@@ -519,10 +519,7 @@ removelfspkg ()
 		rm "${PKGFOLDER}/${pkgfolder}/"*
 		rmdir "${PKGFOLDER}/${pkgfolder}"
 		echo -e "${RED}Un-Installing $pkgname ...${NORMAL}\n" >&2
-		oldsimple=$SIMPLEUPDATE
-		SIMPLEUPDATE=1
 		updatedatabase
-		SIMPLEUPDATE=$oldsimple
 	else
 		exit 0
 	fi
@@ -533,9 +530,7 @@ doinstall ()
 	local pkgpath="$1"
 	local pkgname
 	local callingfolder
-	local oldsimple
 
-	
 	pkgfolder="$(basename "${pkgpath%-?*}")"
 	pkgname="$(basename "${pkgpath/.tar.gz/}")"
 
@@ -971,7 +966,9 @@ updatedatabase ()
 				done
 		fi
 	popd &>/dev/null
-	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
+	if [ $SIMPLEUPDATE -lt 2 ];then
+		$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
+	fi
 }
 
 setupLfspkgRCFile ()

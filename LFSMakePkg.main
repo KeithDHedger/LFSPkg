@@ -274,10 +274,7 @@ removelfspkg ()
 		rm "${PKGFOLDER}/${pkgfolder}/"*
 		rmdir "${PKGFOLDER}/${pkgfolder}"
 		echo -e "${RED}Un-Installing $pkgname ...${NORMAL}\n" >&2
-		oldsimple=$SIMPLEUPDATE
-		SIMPLEUPDATE=1
 		updatedatabase
-		SIMPLEUPDATE=$oldsimple
 	else
 		exit 0
 	fi
@@ -288,9 +285,7 @@ doinstall ()
 	local pkgpath="$1"
 	local pkgname
 	local callingfolder
-	local oldsimple
 
-	
 	pkgfolder="$(basename "${pkgpath%-?*}")"
 	pkgname="$(basename "${pkgpath/.tar.gz/}")"
 
@@ -726,7 +721,9 @@ updatedatabase ()
 				done
 		fi
 	popd &>/dev/null
-	$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
+	if [ $SIMPLEUPDATE -lt 2 ];then
+		$FINDHELPER "${BUILDSCRIPTS}" "${ROOTDIR}" L> "${DATABASE}"
+	fi
 }
 
 setupLfspkgRCFile ()
