@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Sun 30 Jan 14:57:34 GMT 2022
+#Fri 11 Feb 20:50:11 GMT 2022
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -516,8 +516,12 @@ removelfspkg ()
 						fi
 					done < <(listcontents "$pkgname")
 			done
-		rm "${PKGFOLDER}/${pkgfolder}/"*
-		rmdir "${PKGFOLDER}/${pkgfolder}"
+		rm "${PKGFOLDER}/${pkgfolder}/${pkgname}.tar.gz"
+		if ! ls -1 "${PKGFOLDER}/${pkgfolder}"|grep -i .tar.gz &>/dev/null;then
+			rm "${PKGFOLDER}/${pkgfolder}"/*
+			rmdir "${PKGFOLDER}/${pkgfolder}"
+		fi
+
 		echo -e "${RED}Un-Installing $pkgname ...${NORMAL}\n" >&2
 		updatedatabase
 	else

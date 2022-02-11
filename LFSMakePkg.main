@@ -271,8 +271,12 @@ removelfspkg ()
 						fi
 					done < <(listcontents "$pkgname")
 			done
-		rm "${PKGFOLDER}/${pkgfolder}/"*
-		rmdir "${PKGFOLDER}/${pkgfolder}"
+		rm "${PKGFOLDER}/${pkgfolder}/${pkgname}.tar.gz"
+		if ! ls -1 "${PKGFOLDER}/${pkgfolder}"|grep -i .tar.gz &>/dev/null;then
+			rm "${PKGFOLDER}/${pkgfolder}"/*
+			rmdir "${PKGFOLDER}/${pkgfolder}"
+		fi
+
 		echo -e "${RED}Un-Installing $pkgname ...${NORMAL}\n" >&2
 		updatedatabase
 	else

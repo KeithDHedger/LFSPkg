@@ -1,3 +1,9 @@
+0.4.25
+Fixed removing packages with multiple build numbers.
+
+0.4.24
+Internal release.
+
 0.4.23
 Fixed updating packages not removing orphaned files.
 Tweaked documentation.
