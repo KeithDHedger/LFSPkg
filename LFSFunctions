@@ -121,19 +121,19 @@ sanitycheck ()
 {
 	mkdir -vp "$COMPILEAT" "$SOURCEARCHIVES" "$OUTPUT" &>/dev/null
 	if [ "$(sanitycheckfolder "$COMPILEAT")" = "NOTWRITABLE" ];then
-		echo "Can't write to $COMPILEAT defined by COMPILEAT"
+		echo -e "${RED}Can't write to $COMPILEAT defined by COMPILEAT${NORMAL}"
 		stat -c "%U:%G %A" "$OUTPUT"
 		exit 200
 	fi
 
 	if [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTREADABLE" ] || [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTWRITABLE" ];then
-		echo "Can't read/write to/from $SOURCEARCHIVES defined by SOURCEARCHIVES"
+		echo "${RED}Can't read/write to/from $SOURCEARCHIVES defined by SOURCEARCHIVES${NORMAL}"
 		stat -c "%U:%G %A" "$SOURCEARCHIVES"
 		exit 200
 	fi
 
 	if [ "$(sanitycheckfolder "$OUTPUT")" = "NOTWRITABLE" ];then
-		echo "Can't write to $OUTPUT defined by OUTPUT"
+		echo "${RED}Can't write to $OUTPUT defined by OUTPUT${NORMAL}"
 		stat -c "%U:%G %A" "$OUTPUT"
 		exit 200
 	fi
@@ -424,7 +424,7 @@ gettar ()
 		fi
 
 		if ! wget --no-check-certificate -c "$url" -O "$outname";then
-			echo "!!!!!!!Can't download file $1!!!!!"
+			echo -e "${RED}!!!!!!!Can't download file $1!!!!!${NORMAL}"
 			rm "$outname"
 			if [ $EXITONFAIL -eq 1 ];then
 				popd
