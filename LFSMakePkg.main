@@ -857,12 +857,22 @@ main ()
 	if [ $REMOVE -eq 1 ];then
 		if [ $OPTCOUNT -eq 1 ];then
 			selectsinglepkg "remove" "${OPTS[0]}"
-			removelfspkg "$SELECTEDPKG"
+			if [ $DRYRUN -eq 1 ];then
+				echo "[SIMULATED] removelfspkg $SELECTEDPKG"
+			else
+				removelfspkg "$SELECTEDPKG"
+			fi
 		else
 			selectmultipkg "remove"
-			for ((cnt=0;cnt<${#SELECTEDPKG[@]};cnt++))
+			localselectedpkgs=( ${SELECTEDPKG[@]} )
+			for arg in ${SELECTEDPKG[@]}
 				do
-					removelfspkg "${SELECTEDPKG[$cnt]//\"/}"
+					selectsinglepkg "remove" $arg
+					if [ $DRYRUN -eq 1 ];then
+						echo "[SIMULATED]removelfspkg $SELECTEDPKG"
+					else
+						removelfspkg "$SELECTEDPKG"
+					fi
 				done
 		fi
 		return

@@ -1,4 +1,5 @@
 0.4.25
+Fixed removing multple packages at the same time.
 Fixed removing packages with multiple build numbers.
 
 0.4.24
