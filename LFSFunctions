@@ -18,6 +18,7 @@
 #along with LFSMakePkg.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#set -x
 if [ X"$THISTTY" = "X" ];then
 	export THISTTY=$(tty)
 fi
@@ -127,13 +128,17 @@ sanitycheck ()
 	fi
 
 	if [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTREADABLE" ] || [ "$(sanitycheckfolder "$SOURCEARCHIVES")" = "NOTWRITABLE" ];then
-		echo "${RED}Can't read/write to/from $SOURCEARCHIVES defined by SOURCEARCHIVES${NORMAL}"
+		echo -e "${RED}Can't read/write to/from $SOURCEARCHIVES defined by SOURCEARCHIVES${NORMAL}"
 		stat -c "%U:%G %A" "$SOURCEARCHIVES"
 		exit 200
 	fi
 
+	if [ $UID -eq 0 ];then
+		chmod 777 "$OUTPUT"
+	fi
+
 	if [ "$(sanitycheckfolder "$OUTPUT")" = "NOTWRITABLE" ];then
-		echo "${RED}Can't write to $OUTPUT defined by OUTPUT${NORMAL}"
+		echo -e "${RED}Can't write to $OUTPUT defined by OUTPUT${NORMAL}"
 		stat -c "%U:%G %A" "$OUTPUT"
 		exit 200
 	fi
@@ -757,28 +762,29 @@ extractarchive ()
 	local what=$2
 	local comm="tar -xvf"
 	local upname
-	local resetperms=1
+#	local resetperms=1
 
 	case $what in
 		"zip")
-			resetperms=0
+			#resetperms=0
 			comm="unzip"
 			;;
 		*)
 			upname="${archive^^}"
 			if [ "${upname##?*.}" = "ZIP" ];then
-				resetperms=0
+				#resetperms=0
 				comm=unzip
 			fi
 			;;
 	esac
 
 	if [ $UID -eq 0 ];then
-		if [ $resetperms -eq 1 ];then
-			perms=$(stat --format="%a" $(pwd));$comm "$archive";chmod $perms $(pwd)
-		else
-			$comm "$archive"
-		fi
+		su -s "/bin/sh" nobody -c "$comm  "$archive""
+#		if [ $resetperms -eq 1 ];then
+#			perms=$(stat --format="%a" $(pwd));$comm "$archive";chmod $perms $(pwd)
+#		else
+#			$comm "$archive"
+#		fi
 	else
 		$comm "$archive"
 	fi
