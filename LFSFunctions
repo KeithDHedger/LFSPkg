@@ -762,7 +762,7 @@ extractarchive ()
 	local what=$2
 	local comm="tar -xvf"
 	local upname
-#	local resetperms=1
+	local resetperms=1
 
 	case $what in
 		"zip")
@@ -779,12 +779,14 @@ extractarchive ()
 	esac
 
 	if [ $UID -eq 0 ];then
-		su -s "/bin/sh" nobody -c "$comm  "$archive""
-#		if [ $resetperms -eq 1 ];then
-#			perms=$(stat --format="%a" $(pwd));$comm "$archive";chmod $perms $(pwd)
-#		else
-#			$comm "$archive"
-#		fi
+#		su -s "/bin/sh" nobody -c "$comm  "$archive""//TODO//
+		if [ $resetperms -eq 1 ];then
+			perms=$(stat --format="%a" $(pwd))
+			$comm "$archive"
+			chmod $perms $(pwd)
+		else
+			$comm "$archive"
+		fi
 	else
 		$comm "$archive"
 	fi
