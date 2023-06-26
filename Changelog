@@ -1,3 +1,8 @@
+0.4.26
+Added RUNINSTALLSCRIPTS env var to prevent install scripts being run if desired ( 1 ( default ) run them, 0 dont ).
+Fixed LFSPkgSetUp.
+Fixed checking for package with ANYVERSION=1.
+
 0.4.25
 Fixed removing multple packages at the same time.
 Fixed removing packages with multiple build numbers.

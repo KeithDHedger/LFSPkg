@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue 20 Jun 21:07:55 BST 2023
+#Sun 25 Jun 20:13:59 BST 2023
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -16,7 +16,7 @@ lfspkgargs ()
 {
 
 APPNAME="lfspkg"
-VERSION="0.4.25"
+VERSION="0.4.26"
 
 POSTINSTALL=0
 PREINSTALL=0
@@ -43,6 +43,7 @@ NOTINSTALLED=0
 TEMPLATE=""
 REBUILD=0
 UPGRADE=0
+FINDBUILDSCRIPT=""
 WEBPAGE=""
 EXPLAIN=""
 
@@ -130,6 +131,10 @@ do
 		-u|--upgrade)
 			UPGRADE=1
 			;;
+		-w|--findbuildscript)
+			FINDBUILDSCRIPT="$2"
+			shift
+			;;
 		-W|--webpage)
 			WEBPAGE="$2"
 			shift
@@ -208,6 +213,7 @@ do
 			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,meson,cmake,perl or python[2|3]"
 			echo "-U|--rebuild : Re-build database"
 			echo "-u|--upgrade : Upgrade package"
+			echo "-w|--findbuildscript : Try to find build script from the web"
 			echo "-W|--webpage : Try to find webpage for build"
 			echo "-x|--explain : Print installed package info ( info/[pre|post]install script(s)/build script )"
 			echo "-b|--build : Build of package"
@@ -227,7 +233,8 @@ CHECKETC=0 Don't check for possible config files, 1=check.
 NODOWNLOAD=0 Download tarball, 1=Don't download tarball.
 FORCEDOWNLOAD !='' Remove old tarball before downloading.
 NODEPS !='' Don't build dependencies.
-ANYVERSION !='' Ignore version
+RUNINSTALLSCRIPTS=1 ( default ) run pre/post install scripts, 0=Don't run pre/post install scripts.
+ANYVERSION=1 Ignore version
 USESYSTEMD see manpage
 SIMPLEUPDATE=0 Full update of db, 1=Only update as needed, 2=Don't update.
 DELETEDOCS=1 Try to Remove as much documentaion as possible.
@@ -321,6 +328,7 @@ init ()
 	ROOTDIR=$(cleanFolderPath $ROOTDIR)
 	BUILDSCRIPTS=$(cleanFolderPath $BUILDSCRIPTS)
 	DRYRUN=${DRYRUN:-0}
+	RUNINSTALLSCRIPTS=${RUNINSTALLSCRIPTS:-1}
 
 	export ROOTDIR BUILDSCRIPTS
 }
@@ -545,22 +553,27 @@ doinstall ()
 
 	pushd "$ROOTDIR"
 		tar --keep-directory-symlink  -xpf "$1" ./preinstall &>/dev/null||true
-		
-		if [ -e ./preinstall ];then
-			savestdin
-				echo -e "${GREEN}Running pre-install for $pkgname ...${NORMAL}\n" >&2
-				./preinstall
-			restorestdin
+
+		if [[ $RUNINSTALLSCRIPTS -eq 1 ]];then
+			if [ -e ./preinstall ];then
+				savestdin
+					echo -e "${GREEN}Running pre-install for $pkgname ...${NORMAL}\n" >&2
+					./preinstall
+				restorestdin
+			fi
 		fi
 
 		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
+
 		tar --keep-directory-symlink  -xvpf "$1"
 
-		if [ -e ./postinstall ];then
-			savestdin
-				echo -e "${GREEN}Running post-install for $pkgname ...${NORMAL}\n" >&2
-				./postinstall
-			restorestdin
+		if [[ $RUNINSTALLSCRIPTS -eq 1 ]];then
+			if [ -e ./postinstall ];then
+				savestdin
+					echo -e "${GREEN}Running post-install for $pkgname ...${NORMAL}\n" >&2
+					./postinstall
+				restorestdin
+			fi
 		fi
 
 #database
@@ -893,7 +906,8 @@ builddeps()
 	local buildtype="B"
 
 	if [ X"$NODEPS" != "X" ];then return;fi
-	if [ X"$ANYVERSION" != "X" ];then buildtype="Z";fi
+	#if [ X"$ANYVERSION" != "X" ];then buildtype="Z";fi
+	if [[ $ANYVERSION -eq 1 ]];then buildtype="Z";fi
 
 	while read SCRIPT
 		do
@@ -1026,6 +1040,11 @@ getData ()
 main ()
 {
 	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg quearry quelen quecnt searchtweak
+
+	if [ X$FINDBUILDSCRIPT != "X" ];then
+		findScriptFromWeb "$FINDBUILDSCRIPT"
+		return
+	fi
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
@@ -1249,8 +1268,12 @@ main ()
 
 	for ((cnt=0;cnt<OPTCOUNT;cnt++))
 		do
-			found=( $(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i "${OPTS[cnt]}") )
-			echo "Matches for:${OPTS[cnt]}"
+			pkgnameandvers=${OPTS[cnt]}
+			if [[ $ANYVERSION -eq 1 ]];then
+				pkgnameandvers=${OPTS[cnt]%%-?*}
+			fi
+			found=( $(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i "${pkgnameandvers}") )
+			echo "Matches for:${pkgnameandvers}"
 			for name in ${found[@]}
 				do
 					echo ${name/.tar.gz/}

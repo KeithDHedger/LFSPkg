@@ -76,6 +76,7 @@ init ()
 	ROOTDIR=$(cleanFolderPath $ROOTDIR)
 	BUILDSCRIPTS=$(cleanFolderPath $BUILDSCRIPTS)
 	DRYRUN=${DRYRUN:-0}
+	RUNINSTALLSCRIPTS=${RUNINSTALLSCRIPTS:-1}
 
 	export ROOTDIR BUILDSCRIPTS
 }
@@ -300,22 +301,27 @@ doinstall ()
 
 	pushd "$ROOTDIR"
 		tar --keep-directory-symlink  -xpf "$1" ./preinstall &>/dev/null||true
-		
-		if [ -e ./preinstall ];then
-			savestdin
-				echo -e "${GREEN}Running pre-install for $pkgname ...${NORMAL}\n" >&2
-				./preinstall
-			restorestdin
+
+		if [[ $RUNINSTALLSCRIPTS -eq 1 ]];then
+			if [ -e ./preinstall ];then
+				savestdin
+					echo -e "${GREEN}Running pre-install for $pkgname ...${NORMAL}\n" >&2
+					./preinstall
+				restorestdin
+			fi
 		fi
 
 		echo -e "${GREEN}Installing $pkgname ...${NORMAL}\n" >&2
+
 		tar --keep-directory-symlink  -xvpf "$1"
 
-		if [ -e ./postinstall ];then
-			savestdin
-				echo -e "${GREEN}Running post-install for $pkgname ...${NORMAL}\n" >&2
-				./postinstall
-			restorestdin
+		if [[ $RUNINSTALLSCRIPTS -eq 1 ]];then
+			if [ -e ./postinstall ];then
+				savestdin
+					echo -e "${GREEN}Running post-install for $pkgname ...${NORMAL}\n" >&2
+					./postinstall
+				restorestdin
+			fi
 		fi
 
 #database
@@ -648,7 +654,8 @@ builddeps()
 	local buildtype="B"
 
 	if [ X"$NODEPS" != "X" ];then return;fi
-	if [ X"$ANYVERSION" != "X" ];then buildtype="Z";fi
+	#if [ X"$ANYVERSION" != "X" ];then buildtype="Z";fi
+	if [[ $ANYVERSION -eq 1 ]];then buildtype="Z";fi
 
 	while read SCRIPT
 		do
@@ -781,6 +788,11 @@ getData ()
 main ()
 {
 	local defaultdata pkgs scrvers scrpath deps installed instvers que j arg quearry quelen quecnt searchtweak
+
+	if [ X$FINDBUILDSCRIPT != "X" ];then
+		findScriptFromWeb "$FINDBUILDSCRIPT"
+		return
+	fi
 
 	if [ $SETUP -eq 1 ];then
 		setupLfspkgRCFile
@@ -1004,8 +1016,12 @@ main ()
 
 	for ((cnt=0;cnt<OPTCOUNT;cnt++))
 		do
-			found=( $(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i "${OPTS[cnt]}") )
-			echo "Matches for:${OPTS[cnt]}"
+			pkgnameandvers=${OPTS[cnt]}
+			if [[ $ANYVERSION -eq 1 ]];then
+				pkgnameandvers=${OPTS[cnt]%%-?*}
+			fi
+			found=( $(find "${PKGFOLDER}"/* -type f -exec basename '{}' \;|grep -i "${pkgnameandvers}") )
+			echo "Matches for:${pkgnameandvers}"
 			for name in ${found[@]}
 				do
 					echo ${name/.tar.gz/}
