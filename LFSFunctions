@@ -888,5 +888,5 @@ findScriptFromWeb ()
 	else
 		echo "Nothing at arch .."
 	fi
-
+	rm $htmlpage
 }
