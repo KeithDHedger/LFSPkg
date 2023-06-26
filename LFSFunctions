@@ -839,7 +839,7 @@ findScriptFromWeb ()
 #lfs
 	for lfsversion in "stable" "svn"
 		do
-		curl "https://www.linuxfromscratch.org/blfs/view/stable/longindex.html" 2>/dev/null|hxnormalize -x > $htmlpage
+		curl "https://www.linuxfromscratch.org/blfs/view/stable/longindex.html" 2>/dev/null > $htmlpage
 		startline=$(grep -n 'id="program-index"' $htmlpage|awk -F: '{print $1}')
 
 		hrefs=$(sed -n "$startline,\$p" $htmlpage |grep "$pkg.*:" -A 4|sed -n "s@.*href=\"\([^\"]*\).*@http://www.linuxfromscratch.org/blfs/view/$lfsversion/\1@p"|grep -v "#"|sort -u)
@@ -882,9 +882,9 @@ findScriptFromWeb ()
 		done
 	rm $htmlpage
 #arch search
-	curl "https://aur.archlinux.org/packages?O=0&SeB=n&K=$pkg&outdated=&SB=p&SO=d&PP=50&submit=Go" 2>/dev/null >$htmlpage
-	if ! grep "No packages matched your search criteria" $htmlpage &>/dev/null;then
-		echo "https://aur.archlinux.org/packages?O=0&SeB=n&K=$pkg&outdated=&SB=p&SO=d&PP=50&submit=Go"
+	curl "https://archlinux.org/packages/?sort=&q=$pkg&maintainer=&flagged=" 2>/dev/null >$htmlpage
+	if ! grep "No matching packages found" $htmlpage &>/dev/null;then
+		echo "https://archlinux.org/packages/?sort=&q=$pkg&maintainer=&flagged="
 	else
 		echo "Nothing at arch .."
 	fi
