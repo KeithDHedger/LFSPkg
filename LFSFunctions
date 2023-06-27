@@ -540,7 +540,7 @@ makepkginfo ()
 				fi
 			done
 
-		for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
+		for vers in "15.0" "14.2" "14.1" "14.0" "13.37" "13.1"
 			do
 				echo -e "${GREEN}Checking Slackbuilds version $vers for Info ...${NORMAL}" 1>&2
 				subpage=$(grep -i "SLACKBUILD LOCATION:[ ]*\./[[:alnum:]]*/${appname}$" "${vers}.txt" 2>/dev/null)||true
@@ -576,28 +576,28 @@ showwebpage ()
 						echo -e "${GREEN}Checking BLFS (stable) for $appname version ...${NORMAL}" 1>&2
 						subpage=$(cat blfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
 						if [ X${subpage} != "X" ];then
-							page="http://www.linuxfromscratch.org/blfs/view/stable/${subpage}"
+							page="https://www.linuxfromscratch.org/blfs/view/stable/${subpage}"
 						fi
 						;;
 					"lfsstable")
 						echo -e "${GREEN}Checking LFS (stable) for $appname version ...${NORMAL}" 1>&2
 						subpage=$(cat lfsindex1.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
 						if [ X${subpage} != "X" ];then
-							page="http://www.linuxfromscratch.org/lfs/view/stable/${subpage}"
+							page="https://www.linuxfromscratch.org/lfs/view/stable/${subpage}"
 						fi
 						;;
 					"blfsdev")
 						echo -e "${GREEN}Checking BLFS (development) for $appname version ...${NORMAL}" 1>&2
 						subpage=$(cat blfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
 						if [ X${subpage} != "X" ];then
-							page="http://www.linuxfromscratch.org/blfs/view/svn/${subpage}"
+							page="https://www.linuxfromscratch.org/blfs/view/svn/${subpage}"
 						fi
 						;;
 					"lfsdev")
 						echo -e "${GREEN}Checking LFS (development) for $appname version ...${NORMAL}" 1>&2
 						subpage=$(cat lfsindex0.html | grep -i "/${appname}.html"|sed -n 's/.*\(".*.html"\).*/\1/g;s/"//gp'|head -n1)
 						if [ X${subpage} != "X" ];then
-							page="http://www.linuxfromscratch.org/lfs/view/development/${subpage}"
+							page="https://www.linuxfromscratch.org/lfs/view/development/${subpage}"
 						fi
 						;;
 				esac
@@ -608,7 +608,7 @@ showwebpage ()
 				fi
 			done
 
-		for vers in "14.2" "14.1" "14.0" "13.37" "13.1"
+		for vers in "15.0" "14.2" "14.1" "14.0" "13.37" "13.1"
 			do
 				echo -e "${GREEN}Checking Slackbuilds version $vers for Info ...${NORMAL}" 1>&2
 				subpage=$(grep -i "SLACKBUILD LOCATION:[ ]*\./[[:alnum:]]*/${appname}$" "${vers}.txt" 2>/dev/null)||true
@@ -656,7 +656,7 @@ checkforversion ()
 		for packages in ${OPTS[@]}
 			do
 				appname=$packages
-				for usepage in "lfsstable" "blfsstable" "14.2" "14.1" "14.0" "13.37" "13.1" "lfsdev" "blfsdev"
+				for usepage in "lfsstable" "blfsstable" "15.0" "14.2" "14.1" "14.0" "13.37" "13.1" "lfsdev" "blfsdev"
 					do
 						case $usepage in
 							"lfsstable")
@@ -790,9 +790,6 @@ extractarchive ()
 	else
 		$comm "$archive"
 	fi
-
-	
-
 }
 
 printBuildInfo ()
