@@ -2,7 +2,7 @@
 
 ############################################################
 #keithhedger
-#Tue 27 Jun 13:46:54 BST 2023
+#Fri 14 Jul 14:46:12 BST 2023
 #Built using: makeswitch -c LFSMakePkg.conf
 ############################################################
 
@@ -39,6 +39,7 @@ DEPENDSON=0
 CHECKALL=0
 SETUP=0
 REMOVE=0
+TEXTMENUS=0
 NOTINSTALLED=0
 TEMPLATE=""
 REBUILD=0
@@ -117,6 +118,9 @@ do
 			;;
 		-r|--remove)
 			REMOVE=1
+			;;
+		-tm|--textmenus)
+			TEXTMENUS=1
 			;;
 		-T|--notinstalled)
 			NOTINSTALLED=1
@@ -209,6 +213,7 @@ do
 			echo "-P|--checkall : Check all packages for possible upgrade"
 			echo "-Q|--setup : Setup lfspkg.rc file"
 			echo "-r|--remove : Remove package"
+			echo "-tm|--textmenus : Use text menu select instead of dialog"
 			echo "-T|--notinstalled : List packages not installed"
 			echo "-t|--template : Create LFSBuild template for source tarball, takes configure,meson,cmake,perl or python[2|3]"
 			echo "-U|--rebuild : Re-build database"
@@ -421,7 +426,7 @@ selectmultipkg ()
 			dialogdata="${dialogdata} \"${arraydata[$cnt]%.tar.gz}\" \"\" off "
 		done
 
-	if  type dialog &>/dev/null;then
+	if type dialog &>/dev/null && [ $MENUQUERY -eq 0 ];then
 		echo $dialogdata|xargs dialog  --checklist "What package do you want to $instruction?" 0 100 0 2>$ANSWER
 	else
 		select pkg in $nodialogarray "EXIT"
@@ -479,7 +484,8 @@ selectsinglepkg ()
 			dialogdata="${dialogdata} \"${array[$cnt]%.tar.gz}\" \"\" off "
 		done
 
-	if  type dialog &>/dev/null;then
+	if type dialog &>/dev/null && [ $MENUQUERY -eq 0 ];then
+#	if  type dialog &>/dev/null;then
 		echo $dialogdata|xargs dialog --radiolist "What package do you want to $instruction?" 0 100 0 2>$ANSWER
 	else
 		select pkg in $nodialogarray "CANCEL"

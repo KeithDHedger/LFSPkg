@@ -169,7 +169,7 @@ selectmultipkg ()
 			dialogdata="${dialogdata} \"${arraydata[$cnt]%.tar.gz}\" \"\" off "
 		done
 
-	if  type dialog &>/dev/null;then
+	if type dialog &>/dev/null && [ $MENUQUERY -eq 0 ];then
 		echo $dialogdata|xargs dialog  --checklist "What package do you want to $instruction?" 0 100 0 2>$ANSWER
 	else
 		select pkg in $nodialogarray "EXIT"
@@ -227,7 +227,8 @@ selectsinglepkg ()
 			dialogdata="${dialogdata} \"${array[$cnt]%.tar.gz}\" \"\" off "
 		done
 
-	if  type dialog &>/dev/null;then
+	if type dialog &>/dev/null && [ $MENUQUERY -eq 0 ];then
+#	if  type dialog &>/dev/null;then
 		echo $dialogdata|xargs dialog --radiolist "What package do you want to $instruction?" 0 100 0 2>$ANSWER
 	else
 		select pkg in $nodialogarray "CANCEL"
