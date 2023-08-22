@@ -201,7 +201,7 @@ fi
 
 rcpath=""
 if [ $UID -eq 0 ];then
-	rcpath=/etc/lfspkg1.rc
+	rcpath=/etc/lfspkg.rc
 else
 	rcpath=$(tty)
 fi
