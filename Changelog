@@ -1,4 +1,5 @@
 0.4.26
+Fixed not setting cmake options from setup.
 Added RUNINSTALLSCRIPTS env var to prevent install scripts being run if desired ( 1 ( default ) run them, 0 dont ).
 Fixed LFSPkgSetUp.
 Fixed checking for package with ANYVERSION=1.
