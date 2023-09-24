@@ -152,8 +152,6 @@ readWithDefault "MESONCONFIGOPTIONS" "Enter Basic Options For \"meson\" Scripts"
 CMAKECONFIGOPTIONS=${CMAKECONFIGOPTIONS:-"-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib\${LIBDIRSUFFIX}/cmake -DLIB_SUFFIX=${LIBDIRSUFFIX} -DUSE_QT5=TRUE -DCMAKE_EXE_LINKER_FLAGS=-L/usr/lib${LIBDIRSUFFIX}/qt5 -DCMAKE_BUILD_TYPE=\"Release\" -Wno-dev"}
 readWithDefault "CMAKECONFIGOPTIONS" "Enter Basic Options For \"cmake\" Scripts"
 
-echo ">>>>"${CMAKECONFIGOPTIONS}"<<<<"
-
 #xorg configure options
 XORG_CONFIG=${XORG_CONFIG:-"--prefix=$XORG_PREFIX --sysconfdir=/etc --mandir=$XORG_PREFIX/share/man --localstatedir=/var --disable-static"}
 readWithDefault "XORG_CONFIG" "Xorg Configure Options"
@@ -207,8 +205,6 @@ if [ $UID -eq 0 ];then
 else
 	rcpath=$(tty)
 fi
-
-rcpath=/tmp/xxx
 
 cat > $rcpath << EOF
 LFSVERSION=$LFSVERSION
