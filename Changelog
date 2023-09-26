@@ -1,4 +1,5 @@
 0.4.26
+Added packaging via pip2/3 template.
 Updated manpage.
 Added userdata to lfspkg.rc.
 Fixed not setting cmake options from setup.

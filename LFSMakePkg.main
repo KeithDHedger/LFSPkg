@@ -441,6 +441,8 @@ maketemplate ()
 	local suffix
 	local upperdir
 	local infodata
+	local pipcheck
+	local pipnum
 
 	for pkgpath in ${OPTS[@]}
 		do
@@ -461,6 +463,70 @@ maketemplate ()
 			if [ "X$infodata" != X ];then
 				echo "$infodata" > ${lfsname}/info
 			fi
+
+			pipcheck=${TEMPLATE%?*}
+			if [ "X${pipcheck^^}" = "XPIP" ];then
+				pipnum=${TEMPLATE: -1}
+				if [ $pipnum -eq 3 ];then
+					lfsversion=$(pip index versions pylibmc 2>/dev/null|head -n1|sed 's/.*(\(.*\))/\1/')
+				else
+					lfsversion=$(pip2 install --use-deprecated=legacy-resolver build== 2>&1|tail -n2|sed -n 's/.* \(.*\))$/\1/p')
+				fi
+				cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
+#!/bin/bash -e
+
+. /usr/share/LFSPkg/LFSFunctions
+
+trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
+
+PKGNAME="$lfsname"
+TARNAME=""
+VERSION="$lfsversion"
+BUILD=1
+SECTION="PYTHONMODULES"
+SUFFIX="LFSPKG"
+TARBALL=""
+PKG="\${OUTPUT}/\${PKGNAME}"
+DOWHAT=\${1:-"build"}
+CWD=\$(pwd)
+
+scriptLog "\${PKGNAME}-\${VERSION}"
+rm -rf "\$PKG" || true
+mkdir -p "\$PKG"
+
+pip$pipnum install --root="\$PKG" \${PKGNAME}
+
+checketc "\$PKG"
+packageclean "\$PKG" "\$CWD"
+
+pushd "\$PKG"
+	lfspkg -n "\$PKGNAME" -p "\$VERSION" -d \$SECTION -b \$BUILD -s \$SUFFIX -m
+popd
+
+case \$DOWHAT in
+	up*)
+		lfspkg "^\${PKGNAME}-[0-9][0-9]*" "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -u
+		;;
+	"install")
+		lfspkg "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -i
+		;;
+	"build")
+		echo "Just built"
+		;;
+	*)
+		echo "*** Unknown command ***"
+		exit 1
+esac
+
+rm -r "\$PKG"
+EOF
+
+			chmod +x "${lfsname}/$lfsname.LFSBuild"
+			chmod +x "${lfsname}/preinstall"
+			chmod +x "${lfsname}/postinstall"
+			continue
+			fi
+
 			cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
 #!/bin/bash -e
 
