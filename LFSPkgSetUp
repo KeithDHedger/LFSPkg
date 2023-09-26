@@ -23,6 +23,7 @@ LOCALLFSVERSION=10.1
 PIBUILD=0
 PIVERS=4
 USESYSTEMD=0
+USERDATA=
 
 #$1=varname $2=message
 readWithDefault ()
@@ -51,18 +52,12 @@ case $(uname -m) in
 		;;
 esac
 
-unset LIBDIRSUFFIX
-unset CONFIGOPTIONS
-unset MESONCONFIGOPTIONS
-unset CMAKEOPTIONS
-unset XORG_CONFIG
-unset MAKEFLAGS
-
 #set variables if possible
 if [ -e /etc/lfspkg.rc ];then
 	. /etc/lfspkg.rc
+	USERDATA=$(sed -n '/####USER DATA####/,$p'  /etc/lfspkg.rc)
 else
-	LFSVERSION=9.0
+	LFSVERSION=12.0
 	PIBUILD=0
 	PIVERS=4
 	USESYSTEMD=0
@@ -71,13 +66,13 @@ else
 	OUTPUT="/LFSBuiltPackages/$LFSVERSION"
 	SOURCEARCHIVES="/LFSSourceArchives/$LFSVERSION"
 	PKGARCHIVES="/LFSBuiltPackages/$LFSVERSION"
-	COMPILEAT="/LFSSourceArchives/10.1"
+	COMPILEAT="/LFSSourceArchives/$LFSVERSION"
 	SCRIPTLOG=1
 	CHECKETC=1
 
-	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib640 --disable-nls --disable-static"
-	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib64 --buildtype=release --default-library=shared"
-	CMAKEOPTIONS="-DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64 -DCMAKE_PREFIX_PATH=/usr/lib64/qt5/cmake -DUSE_QT5=TRUE  -Wno-dev"
+	CONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib --disable-nls --disable-static"
+	MESONCONFIGOPTIONS="--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib --buildtype=release --default-library=shared"
+	CMAKEOPTIONS="-DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX="" -DCMAKE_PREFIX_PATH=/usr/lib/qt5/cmake -DUSE_QT5=TRUE  -Wno-dev"
 	XORG_CONFIG="--prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --localstatedir=/var --disable-static"
 
 	MAKEFLAGS="-j$(($(nproc)-1))"
@@ -91,7 +86,7 @@ else
 fi
 
 #LFS Version
-LFSVERSION=${LFSVERSION:-"10.1"}
+LFSVERSION=${LFSVERSION:-"12.0"}
 readWithDefault "LFSVERSION" "Enter Version"
 
 #use systemd :(
@@ -148,19 +143,31 @@ JAVA_HOME=${JAVA_HOME:-"/opt/jdk"}
 readWithDefault "JAVA_HOME" "Java Install Location"
 
 #general config options
-CONFIGOPTIONS=${CONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib\${LIBDIRSUFFIX} --enable-gtk-doc --disable-debug --disable-nls --disable-static"}
+if [ -e /etc/lfspkg.rc ];then
+	unset CONFIGOPTIONS
+	CONFIGOPTIONS=$(sed -n 's/^CONFIGOPTIONS=\(.*\)$/\1/p' /etc/lfspkg.rc|sed 's/"//g')
+fi
 readWithDefault "CONFIGOPTIONS" "Enter Basic Options For \"configure\" Scripts"
 
 #config options for meson
-MESONCONFIGOPTIONS=${MESONCONFIGOPTIONS:-"--prefix=/usr --sysconfdir=/etc --libexecdir=/usr/libexec --libdir=/usr/lib\${LIBDIRSUFFIX} --buildtype=release --default-library=shared"}
+if [ -e /etc/lfspkg.rc ];then
+	unset MESONCONFIGOPTIONS
+	MESONCONFIGOPTIONS=$(sed -n 's/^MESONCONFIGOPTIONS=\(.*\)$/\1/p' /etc/lfspkg.rc|sed 's/"//g')
+fi
 readWithDefault "MESONCONFIGOPTIONS" "Enter Basic Options For \"meson\" Scripts"
 
 #cmake config
-CMAKEOPTIONS=${CMAKEOPTIONS:-"-DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib\${LIBDIRSUFFIX}/cmake -DLIB_SUFFIX=${LIBDIRSUFFIX} -DUSE_QT5=TRUE -DCMAKE_EXE_LINKER_FLAGS=-L/usr/lib${LIBDIRSUFFIX}/qt5 -DCMAKE_BUILD_TYPE=\"Release\" -Wno-dev"}
+if [ -e /etc/lfspkg.rc ];then
+	unset CMAKEOPTIONS
+	CMAKEOPTIONS=$(sed -n 's/^CMAKEOPTIONS=\(.*\)$/\1/p' /etc/lfspkg.rc|sed 's/"//g')
+fi
 readWithDefault "CMAKEOPTIONS" "Enter Basic Options For \"cmake\" Scripts"
 
 #xorg configure options
-XORG_CONFIG=${XORG_CONFIG:-"--prefix=$XORG_PREFIX --sysconfdir=/etc --mandir=$XORG_PREFIX/share/man --localstatedir=/var --disable-static"}
+if [ -e /etc/lfspkg.rc ];then
+	unset XORG_CONFIG
+	XORG_CONFIG=$(sed -n 's/^XORG_CONFIG=\(.*\)$/\1/p' /etc/lfspkg.rc|sed 's/"//g')
+fi
 readWithDefault "XORG_CONFIG" "Xorg Configure Options"
 
 #general purpose make flags
@@ -241,5 +248,6 @@ export QT5DIR=$QT5DIR
 export XORG_PREFIX="$XORG_PREFIX"
 export JAVA_HOME=$JAVA_HOME
 
+$USERDATA
 EOF
 

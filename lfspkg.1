@@ -1,4 +1,4 @@
-.TH "LFSPkg" "1" "0.4.23" "K.D.Hedger" ""
+.TH "LFSPkg" "1" "0.4.26" "K.D.Hedger" ""
 .SH "NAME"
 \fBlfspkg\fR - A package manager for Linux From Scratch
 .br
@@ -151,6 +151,11 @@ This is a source based package manager and dependencies can be checked for and b
 	Try to find and open webpage for PKG.
 .br
 
+\fB-w,--findbuildscript\fR \fB[APP]\fR
+.br
+	Try to find build script on various sites.
+.br
+
 \fB-K,--nocolour\fR
 .br
 	Use colour in output default=on.
@@ -289,6 +294,9 @@ This is a source based package manager and dependencies can be checked for and b
 	PIVERS Rpi version 1/2/3/4 ( only 3/4 tested ).
 .br
 	USEROPTIONS Path to user options for scripts, defaults to /etc/pkgoptions, overides PKGNAME.options,  '/LFSPkgBuildScripts/net/webkitgtk/webkitgtk.LFSBuild' for an example of the PKGNAME.options file.
+.br
+
+	All entries after a line containing only ####USER DATA#### will be copied from the existing lfspkg.rc file to the new one, you may put whatever you want here, as this file is sourced any entries here will overide those above this line.
 .br
 
 \fI/var/lib/LFSPackages\fR
