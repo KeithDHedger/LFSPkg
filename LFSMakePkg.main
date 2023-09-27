@@ -468,9 +468,9 @@ maketemplate ()
 			if [ "X${pipcheck^^}" = "XPIP" ];then
 				pipnum=${TEMPLATE: -1}
 				if [ $pipnum -eq 3 ];then
-					lfsversion=$(pip index versions pylibmc 2>/dev/null|head -n1|sed 's/.*(\(.*\))/\1/')
+					lfsversion=$(pip index versions $lfsname 2>/dev/null|head -n1|sed 's/.*(\(.*\))/\1/')
 				else
-					lfsversion=$(pip2 install --use-deprecated=legacy-resolver build== 2>&1|tail -n2|sed -n 's/.* \(.*\))$/\1/p')
+					lfsversion=$(pip2 install --use-deprecated=legacy-resolver $lfsname== 2>&1|tail -n2|sed -n 's/.* \(.*\))$/\1/p')
 				fi
 				cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
 #!/bin/bash -e
