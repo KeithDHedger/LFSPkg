@@ -1,4 +1,7 @@
 
+VERSION=1.0.0
+CONF=LFSMakePkg.conf
+
 PREFIX="/usr"
 DESTDIR=
 PKGNAME="LFSPkg"
@@ -9,19 +12,26 @@ FUNCTIONS="LFSFunctions"
 MANPAGE="${PROGRAM}.1"
 RCFILE="lfspkg.rc"
 SETUP="LFSPkgSetUp"
+TEMPLATES="LFSMakeTemplate"
+
+devbuild:
+	sed -r -i 's/[0-9]+.[0-9]+.[0-9]+/'"$(VERSION)"'/' $(CONF)
+	makeswitch -c $(CONF)
+	g++ -o $(HELPER) $(HELPERCODE)
 
 all:
 	g++ -o $(HELPER) $(HELPERCODE)
 
 clean:
 	rm $(HELPER)||true
+	rm $(PROGRAM)
 
 install:
 	mkdir -vp $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/share/$(PKGNAME) $(DESTDIR)$(PREFIX)/share/man/man1 $(DESTDIR)/etc||true
 	g++ -o $(HELPER) $(HELPERCODE)
 	cp $(HELPER) $(PROGRAM) $(DESTDIR)$(PREFIX)/bin
 	cp $(MANPAGE) $(DESTDIR)$(PREFIX)/share/man/man1
-	cp $(FUNCTIONS) $(SETUP) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
+	cp $(FUNCTIONS) $(SETUP) $(TEMPLATES) $(DESTDIR)$(PREFIX)/share/$(PKGNAME)
 	cp -n $(RCFILE) $(DESTDIR)/etc/$(RCFILE)
 
 	@echo "**************************************************************"

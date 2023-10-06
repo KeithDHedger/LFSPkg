@@ -1,0 +1,322 @@
+#!/bin/bash -e
+
+#©keithhedger Thu 5 Oct 11:51:31 BST 2023 kdhedger68713@gmail.com
+
+. LFSFunctions
+
+SCRIPTPKGNAME=""
+SCRIPTPKGVERSION=""
+SCRIPTPKGSECTION=""
+SCRIPTSUFFIX=""
+SCRIPTTARBALL=""
+SCRIPTARCHIVEDIR=""
+SCRIPTTARURL=""
+
+getBool ()
+{
+	if [[ -z "$1" ]];then
+		echo 0
+	else
+		echo 1
+	fi
+}
+
+makeGetArchive ()
+{
+	local gitoptions=""
+
+	if [ $ISGITREPO -eq 0 ];then
+		echo gettar \"${SCRIPTPKGARCHIVEDIR}/\${TARBALL}\" \$SECTION
+	else
+		if [[ $GITTYPE = "tag" ]];then
+			gitoptions=" --branch ${GITTAG} --single-branch"
+		fi
+
+		cat<<EOF
+mkdir -p \${SOURCEARCHIVES}/GITREPOS
+pushd \${SOURCEARCHIVES}/GITREPOS
+	if [[ ! -e \${TARNAME} ]];then
+		git clone ${SCRIPTPKGTARURL}/\${TARNAME}.git$gitoptions
+EOF
+	if [[ $GITTYPE = "commit" ]];then
+		cat<<EOF
+		cd \${TARNAME}
+		git reset --hard ${GITTAG}
+		git clean -df
+EOF
+	fi
+	cat<<EOF
+	else
+		if [ "X\${DOWHAT:0:2}" = "Xup" ];then
+			cd \${TARNAME}
+			git pull
+		fi
+	fi
+popd
+EOF
+	fi
+}
+
+makeCommonHeader ()
+{
+	mkdir -vp $SCRIPTPKGNAME||true
+	echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${SCRIPTPKGNAME}/preinstall
+	echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${SCRIPTPKGNAME}/postinstall
+
+	infodata=$(lfspkg -I ${SCRIPTPKGNAME} 2>/dev/null) 2>/dev/null||true
+	if [ "X$infodata" != X ];then
+		echo "$infodata" > ${SCRIPTPKGNAME}/info
+	fi
+
+	cat >"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+#!/bin/bash -e
+
+. /usr/share/LFSPkg/LFSFunctions
+
+trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
+
+DEPENDS=""
+if ! lfspkg -B "\$DEPENDS";then
+	exit 100
+fi
+
+PKGNAME="$SCRIPTPKGNAME"
+TARNAME="\$PKGNAME"
+VERSION="$SCRIPTPKGVERSION"
+BUILD=\${BUILD:-1}
+SECTION="$SCRIPTPKGSECTION"
+SUFFIX="LFSPKG"
+TARBALL="\${TARNAME}-\${VERSION}${SCRIPTPKGSUFFIX}"
+PKG="\${OUTPUT}/\${PKGNAME}"
+DOWHAT=\${1:-"build"}
+CWD=\$(pwd)
+
+rm -rf "\$PKG" || true
+mkdir -p "\$PKG"
+scriptLog "\${PKGNAME}-\${VERSION}"
+EOF
+	if [ $ISPIP -eq 0 ];then
+		cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+$(makeGetArchive)
+
+if [ \$USESYSTEMD -eq 0 ];then
+	:
+fi
+
+pushd \$COMPILEAT 2>/dev/null||true
+EOF
+	else
+		echo -e "\npip install --root="\$PKG" \${PKGNAME}\n" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+		return
+	fi
+
+	if [ $ISGITREPO -eq 0 ];then
+		echo -e "\textractarchive \"\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}\"" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+		echo -e "\tpushd \"\${TARNAME}-\${VERSION}\"" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+	else
+		echo -e "\tpushd \"\${SOURCEARCHIVES}/GITREPOS/\${TARNAME}\"" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+	fi
+}
+
+makeCommonFooter ()
+{
+	if [ $ISPIP -eq 0 ];then
+		TABS="	"
+		TAB1="	"
+	else
+		TAB1=""
+		TABS="	"
+	fi
+
+	if [ $ISPIP -eq 0 ];then
+		cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+${TABS}popd
+
+EOF
+	fi
+
+	cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+${TAB1}checketc \$PKG
+${TAB1}packageclean "\$PKG" "\$CWD"
+
+${TAB1}pushd "\$PKG"
+${TAB1}${TABS}lfspkg -n "\$PKGNAME" -p "\$VERSION" -d "\$SECTION" -b "\$BUILD" -s "\$SUFFIX" -m
+${TAB1}popd
+
+${TAB1}case \$DOWHAT in
+${TAB1}${TABS}up*)
+${TAB1}${TABS}${TABS}lfspkg "^\${PKGNAME}-[0-9][0-9]*" "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -u
+${TAB1}${TABS}${TABS};;
+${TAB1}${TABS}"install")
+${TAB1}${TABS}${TABS}lfspkg "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -i
+${TAB1}${TABS}${TABS};;
+${TAB1}${TABS}"build")
+${TAB1}${TABS}${TABS}echo "Just built"
+${TAB1}${TABS}${TABS};;
+${TAB1}${TABS}*)
+${TAB1}${TABS}${TABS}echo "*** Unknown command ***"
+${TAB1}${TABS}${TABS}exit 1
+${TAB1}esac
+EOF
+	if [ $ISPIP -eq 0 ];then
+		cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+
+${TAB1}rm -rf "\$PKG"$(if [ $ISGITREPO -eq 0 ];then echo " "\"\${TARNAME}-\${VERSION}\";fi)
+popd 2>/dev/null||true
+EOF
+	else
+		cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+
+${TAB1}rm -rf "\$PKG"
+EOF
+	fi
+}
+
+getScriptData ()
+{
+	local url bn section
+
+	url=${DOWNLOADARCHIVE}
+	bn="$(basename "$url")"
+	section="$(basename "$(pwd)")"
+
+	SCRIPTPKGSECTION=${section^^}
+	SCRIPTPKGARCHIVEDIR=$(dirname "$url")
+
+	if [ $ISGITREPO -eq 0 ];then
+
+		SCRIPTPKGNAME=${bn%-?*}
+		SCRIPTPKGVERSION="$(echo ${bn##?*-}|sed -n 's/\([[:digit:]][\.[[:digit:]]*]*\)\...*/\1/p')"
+		SCRIPTPKGSUFFIX="$(echo ${bn##?*-}|sed -n 's/[[:digit:]][\.[[:digit:]]*]*\(\...*\)/\1/p')"
+		SCRIPTPKGTARBALL=${SCRIPTPKGNAME}-${SCRIPTPKGVERSION}.${SCRIPTPKGSUFFIX}
+		SCRIPTPKGTARURL=${SCRIPTPKGARCHIVEDIR}/${SCRIPTPKGTARBALL}
+	else
+		SCRIPTPKGNAME="${bn%.git}"
+		SCRIPTPKGVERSION="$LFSVERSION"
+		SCRIPTPKGTARURL=${SCRIPTPKGARCHIVEDIR}
+	fi
+
+if false;then 
+echo -------------------
+	echo SCRIPTPKGNAME=$SCRIPTPKGNAME
+	echo SCRIPTPKGVERSION=$SCRIPTPKGVERSION
+	echo SCRIPTPKGSECTION=$SCRIPTPKGSECTION
+	echo SCRIPTPKGSUFFIX=$SCRIPTPKGSUFFIX
+	echo SCRIPTPKGTARBALL=$SCRIPTPKGTARBALL
+	echo SCRIPTPKGARCHIVEDIR=$SCRIPTPKGARCHIVEDIR
+	echo SCRIPTPKGTARURL=$SCRIPTPKGTARURL
+	echo GITTAG=$GITTAG
+echo +++++++++++++++++++
+fi
+}
+
+makeConfigureScript ()
+{
+	cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+		CFLAGS="\$LFSFLAGS" CXXFLAGS="\$LFSFLAGS" ./configure \${CONFIGOPTIONS}
+		make \$MAKEFLAGS||make -j1|| exit 100
+		make install DESTDIR=\$PKG || exit 100
+EOF
+}
+
+makeMesonScript ()
+{
+	cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+		mkdir -p build
+		cd build
+		CFLAGS="\$LFSFLAGS" CXXFLAGS="\$LFSFLAGS" meson setup \${MESONCONFIGOPTIONS} ..
+		ninja \$MAKEFLAGS||ninja -j1||exit 100
+		DESTDIR=\$PKG ninja install
+EOF
+}
+
+makeCMakeScript ()
+{
+	cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+		mkdir -p build
+		cd  build
+		cmake \$CMAKEOPTIONS ..
+		make \$MAKEFLAGS||make -j1|| exit 100
+		make install DESTDIR=\$PKG || exit 100
+EOF
+}
+
+makePerlScript ()
+{
+	cat >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"<< EOF
+		perl Makefile.PL
+		make \$MAKEFLAGS||make -j1|| exit 100
+		make install DESTDIR=\$PKG || exit 100
+EOF
+}
+
+makePythonScript ()
+{
+	if [[ ${1} -eq 2 ]] || [[ ${1} -eq 23 ]];then
+		echo -e "\t\tpython2 setup.py build||exit 100" >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+		echo -e "\t\tpython2 setup.py install --optimize=1 --root=\$PKG||exit 100" >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+	fi
+	if [[ $1 -eq 3 ]] || [[ ${1} -eq 23 ]];then
+		echo -e "\t\tpython3 setup.py build||exit 100" >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+		echo -e "\t\tpython3 setup.py install --optimize=1 --root=\$PKG||exit 100" >>"${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+	fi
+}
+
+DOWNLOADARCHIVE="$2"
+ISGITREPO=$(getBool "$3")
+GITTYPE=""
+GITTAG=""
+
+case "${3%%=?*}" in
+	tag)
+		GITTYPE="tag"
+		GITTAG=${3##?*=}
+		;;
+	commit)
+		GITTYPE="commit"
+		GITTAG=${3##?*=}
+		;;
+	git)
+		GITTYPE="git"
+		GITTAG=""
+		;;
+esac
+
+getScriptData
+if [[ ${1} = "pip" ]];then
+	ISPIP=1
+	SCRIPTPKGVERSION=$(pip index versions $SCRIPTPKGNAME 2>/dev/null|head -n1|sed 's/.*(\(.*\))/\1/')
+else
+	ISPIP=0
+fi
+
+makeCommonHeader
+
+case ${1} in
+	conf*)
+		makeConfigureScript
+		;;
+	meson)
+		makeMesonScript
+		;;
+	cmake)
+		makeCMakeScript
+		;;
+	perl)
+		makePerlScript
+		;;
+	python)
+		makePythonScript 23
+		;;
+	python2)
+		makePythonScript 2
+		;;
+	python3)
+		makePythonScript 3
+		;;
+esac
+
+makeCommonFooter
+chmod +x "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"	
+chmod +x "${SCRIPTPKGNAME}/preinstall"	
+chmod +x "${SCRIPTPKGNAME}/postinstall"	

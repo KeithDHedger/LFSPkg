@@ -14,10 +14,12 @@ if [ "X$LOCAL" != "X" ];then
 	FINDHELPER=$(pwd)/finddepends
 	. $(pwd)/LFSFunctions
 	LFSSETUP=$(pwd)/LFSPkgSetUp
+	LFSMAKETEMPLATE=$(pwd)/LFSMakeTemplate
 else
 	. /usr/share/LFSPkg/LFSFunctions
 	FINDHELPER=/usr/bin/finddepends
 	LFSSETUP=/usr/share/LFSPkg/LFSPkgSetUp
+	LFSMAKETEMPLATE=/usr/share/LFSPkg/LFSMakeTemplate
 fi
 
 cleanFolderPath ()
@@ -434,228 +436,6 @@ updatelfspkg ()
 	rm /tmp/newp.$$ /tmp/old.$$
 }
 
-maketemplate ()
-{
-	local pkgpath pkgname pkgdir
-	local lfsname lfsversion
-	local suffix
-	local upperdir
-	local infodata
-	local pipcheck
-	local pipnum
-
-	for pkgpath in ${OPTS[@]}
-		do
-			pkgname="$(basename "${pkgpath/.tar.*/}")"
-			pkgdir="$(dirname "${pkgpath/.tar.*/}")"
-			lfsname=${pkgname%-?*}
-			lfsversion=${pkgname##?*-}
-			if [ "X$pkgpath" = "X$pkgname" ];then
-				suffix=".${pkgpath##*.}"
-			else
-				suffix=$(basename ${pkgpath/"${pkgname}"/})
-			fi
-			upperdir="$(echo "$(basename "$(pwd)")"|tr a-z A-Z)"
-			mkdir $lfsname||true
-			echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${lfsname}/preinstall
-			echo -e "#!/bin/bash\n#©$USER $(date)\n\n. /usr/share/LFSPkg/LFSFunctions\n">${lfsname}/postinstall
-			infodata=$(makepkginfo ${lfsname}||true)
-			if [ "X$infodata" != X ];then
-				echo "$infodata" > ${lfsname}/info
-			fi
-
-			pipcheck=${TEMPLATE%?*}
-			if [ "X${pipcheck^^}" = "XPIP" ];then
-				pipnum=${TEMPLATE: -1}
-				if [ $pipnum -eq 3 ];then
-					lfsversion=$(pip index versions $lfsname 2>/dev/null|head -n1|sed 's/.*(\(.*\))/\1/')
-				else
-					lfsversion=$(pip2 install --use-deprecated=legacy-resolver $lfsname== 2>&1|tail -n2|sed -n 's/.* \(.*\))$/\1/p')
-				fi
-				cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
-#!/bin/bash -e
-
-. /usr/share/LFSPkg/LFSFunctions
-
-trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
-
-PKGNAME="$lfsname"
-TARNAME=""
-VERSION="$lfsversion"
-BUILD=1
-SECTION="PYTHONMODULES"
-SUFFIX="LFSPKG"
-TARBALL=""
-PKG="\${OUTPUT}/\${PKGNAME}"
-DOWHAT=\${1:-"build"}
-CWD=\$(pwd)
-
-scriptLog "\${PKGNAME}-\${VERSION}"
-rm -rf "\$PKG" || true
-mkdir -p "\$PKG"
-
-pip$pipnum install --root="\$PKG" \${PKGNAME}
-
-checketc "\$PKG"
-packageclean "\$PKG" "\$CWD"
-
-pushd "\$PKG"
-	lfspkg -n "\$PKGNAME" -p "\$VERSION" -d \$SECTION -b \$BUILD -s \$SUFFIX -m
-popd
-
-case \$DOWHAT in
-	up*)
-		lfspkg "^\${PKGNAME}-[0-9][0-9]*" "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -u
-		;;
-	"install")
-		lfspkg "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -i
-		;;
-	"build")
-		echo "Just built"
-		;;
-	*)
-		echo "*** Unknown command ***"
-		exit 1
-esac
-
-rm -r "\$PKG"
-EOF
-
-			chmod +x "${lfsname}/$lfsname.LFSBuild"
-			chmod +x "${lfsname}/preinstall"
-			chmod +x "${lfsname}/postinstall"
-			continue
-			fi
-
-			cat >"${lfsname}/$lfsname.LFSBuild"<< EOF
-#!/bin/bash -e
-
-. /usr/share/LFSPkg/LFSFunctions
-
-trap 'echo -e "\$0 \${RED}FAILED\${NORMAL} at line \${GREEN}\${LINENO}\${NORMAL}"' ERR
-
-DEPENDS=""
-if ! lfspkg -B "\$DEPENDS";then
-	exit 100
-fi
-
-PKGNAME="$lfsname"
-TARNAME="\$PKGNAME"
-VERSION="$lfsversion"
-BUILD=1
-SECTION="$upperdir"
-SUFFIX="LFSPKG"
-TARBALL="\${TARNAME}-\${VERSION}${suffix}"
-PKG="\${OUTPUT}/\${PKGNAME}"
-DOWHAT=\${1:-"build"}
-CWD=\$(pwd)
-
-scriptLog "\${PKGNAME}-\${VERSION}"
-gettar "${pkgdir}/\${TARBALL}" \$SECTION
-rm -rf "\$PKG" || true
-mkdir -p "\$PKG"
-
-if [ \$USESYSTEMD -eq 0 ];then
-	:
-fi
-
-pushd \$COMPILEAT 2>/dev/null||true
-	extractarchive "\${SOURCEARCHIVES}/\${SECTION}/\${TARBALL}"
-	pushd "\${TARNAME}-\${VERSION}"
-EOF
-
-			case ${TEMPLATE^^} in
-				"CONFIGURE")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		CFLAGS="\$LFSFLAGS" CXXFLAGS="\$LFSFLAGS" ./configure \${CONFIGOPTIONS}
-		make \$MAKEFLAGS||make|| exit 100
-		make install DESTDIR=\$PKG || exit 100
-EOF
-					;;
-
-				"MESON")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		mkdir build || true
-		cd build
-		CFLAGS="\$LFSFLAGS" CXXFLAGS="\$LFSFLAGS" meson \${MESONCONFIGOPTIONS} ..
-		ninja \$MAKEFLAGS||ninja -j1||exit 100
-		DESTDIR=\$PKG ninja install
-EOF
-					;;
-
-				"CMAKE")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		mkdir build || true
-		cd  build
-		cmake \$CMAKEOPTIONS ..
-		make \$MAKEFLAGS||make|| exit 100
-		make install DESTDIR=\$PKG || exit 100
-EOF
-					;;
-				"PYTHON2")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		python2 setup.py build||exit 100
-		python2 setup.py install --optimize=1 --root=\$PKG||exit 100
-EOF
-					;;
-				"PYTHON3")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		python3 setup.py build||exit 100
-		python3 setup.py install --optimize=1 --root=\$PKG||exit 100
-EOF
-					;;
-				"PYTHON")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		python2 setup.py build||exit 100
-		python2 setup.py install --optimize=1 --root=\$PKG||exit 100
-		python3 setup.py build||exit 100
-		python3 setup.py install --optimize=1 --root=\$PKG||exit 100
-EOF
-					;;
-
-				"PERL")
-					cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-		perl Makefile.PL
-		make \$MAKEFLAGS||make|| exit 100
-		make install DESTDIR=\$PKG || exit 100
-EOF
-			
-			esac
-
-			cat >>"${lfsname}/$lfsname.LFSBuild"<< EOF
-	popd
-
-	checketc "\$PKG"
-	packageclean "\$PKG" "\$CWD"
-
-	pushd "\$PKG"
-		lfspkg -n "\$PKGNAME" -p "\$VERSION" -d \$SECTION -b \$BUILD -s \$SUFFIX -m
-	popd
-
-	case \$DOWHAT in
-		up*)
-			lfspkg "^\${PKGNAME}-[0-9][0-9]*" "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -u
-			;;
-		"install")
-			lfspkg "\${PKGARCHIVES}/\${SECTION}/\${PKGNAME}-\${VERSION}-\${BUILD}_\${SECTION}_\${SUFFIX}.tar.gz" -i
-			;;
-		"build")
-			echo "Just built"
-			;;
-		*)
-			echo "*** Unknown command ***"
-			exit 1
-	esac
-
-	rm -r "\$PKG" "\${TARNAME}-\${VERSION}"
-popd 2>/dev/null||true
-EOF
-			chmod +x "${lfsname}/$lfsname.LFSBuild"	
-			chmod +x "${lfsname}/preinstall"	
-			chmod +x "${lfsname}/postinstall"	
-		done
-}
-
 listlfspkg ()
 {
 	selectsinglepkg "list" "${OPTS[0]}"
@@ -967,7 +747,7 @@ main ()
 	fi
 
 	if [ "X$TEMPLATE" != "X" ];then
-		maketemplate
+		$LFSMAKETEMPLATE $TEMPLATE ${OPTS[@]}
 		return
 	fi
 

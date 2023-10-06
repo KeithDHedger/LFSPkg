@@ -1,3 +1,10 @@
+1.0.0
+Added git commit and tag options.
+Added pip option to templates.
+Tidied Makefile.
+Added git downloads to templates.
+Split templates builder to seperate file.
+
 0.4.26
 Added packaging via pip2/3 template.
 Updated manpage.
