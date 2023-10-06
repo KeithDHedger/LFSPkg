@@ -2,7 +2,7 @@
 
 #©keithhedger Thu 5 Oct 11:51:31 BST 2023 kdhedger68713@gmail.com
 
-. LFSFunctions
+. /usr/share/LFSPkg/LFSFunctions
 
 SCRIPTPKGNAME=""
 SCRIPTPKGVERSION=""
