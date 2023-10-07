@@ -4,7 +4,8 @@
 
 . /usr/share/LFSPkg/LFSFunctions
 
-SCRIPTPKGNAME=""
+SCRIPTPKGNAME="${SCRIPTPKGNAME:-$NAME}"
+SCRIPTTARNAME=""
 SCRIPTPKGVERSION=""
 SCRIPTPKGSECTION=""
 SCRIPTSUFFIX=""
@@ -81,12 +82,12 @@ if ! lfspkg -B "\$DEPENDS";then
 fi
 
 PKGNAME="$SCRIPTPKGNAME"
-TARNAME="\$PKGNAME"
+TARNAME="$SCRIPTTARNAME"
 VERSION="$SCRIPTPKGVERSION"
 BUILD=\${BUILD:-1}
 SECTION="$SCRIPTPKGSECTION"
 SUFFIX="LFSPKG"
-TARBALL="\${TARNAME}-\${VERSION}${SCRIPTPKGSUFFIX}"
+$(if [ $ISGITREPO -eq 0 ];then echo "TARBALL=\"\${TARNAME}-\${VERSION}${SCRIPTPKGSUFFIX}\"";else echo TARBALL=\"\";fi)
 PKG="\${OUTPUT}/\${PKGNAME}"
 DOWHAT=\${1:-"build"}
 CWD=\$(pwd)
@@ -106,7 +107,7 @@ fi
 pushd \$COMPILEAT 2>/dev/null||true
 EOF
 	else
-		echo -e "\npip install --root="\$PKG" \${PKGNAME}\n" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
+		echo -e "\npip install --root="\$PKG" \${TARNAME}\n" >> "${SCRIPTPKGNAME}/$SCRIPTPKGNAME.LFSBuild"
 		return
 	fi
 
@@ -182,23 +183,41 @@ getScriptData ()
 
 	SCRIPTPKGSECTION=${section^^}
 	SCRIPTPKGARCHIVEDIR=$(dirname "$url")
+	SCRIPTPKGVERSION=$PKGVERSION
 
 	if [ $ISGITREPO -eq 0 ];then
-
-		SCRIPTPKGNAME=${bn%-?*}
-		SCRIPTPKGVERSION="$(echo ${bn##?*-}|sed -n 's/\([[:digit:]][\.[[:digit:]]*]*\)\...*/\1/p')"
+		if [[ -z "$NAME" ]];then
+			SCRIPTPKGNAME=${bn%-?*}
+			SCRIPTTARNAME="\$PKGNAME"
+		else
+			SCRIPTPKGNAME="$NAME"
+			SCRIPTTARNAME="${bn%-?*}"
+		fi
+		if [[ -z $PKGVERSION ]];then
+			SCRIPTPKGVERSION="$(echo ${bn##?*-}|sed -n 's/\([[:digit:]][\.[[:digit:]]*]*\)\...*/\1/p')"
+		fi
 		SCRIPTPKGSUFFIX="$(echo ${bn##?*-}|sed -n 's/[[:digit:]][\.[[:digit:]]*]*\(\...*\)/\1/p')"
 		SCRIPTPKGTARBALL=${SCRIPTPKGNAME}-${SCRIPTPKGVERSION}.${SCRIPTPKGSUFFIX}
 		SCRIPTPKGTARURL=${SCRIPTPKGARCHIVEDIR}/${SCRIPTPKGTARBALL}
 	else
-		SCRIPTPKGNAME="${bn%.git}"
-		SCRIPTPKGVERSION="$LFSVERSION"
+		SCRIPTPKGNAME="${SCRIPTPKGNAME:-${bn%.git}}"
+		if [[ -z $PKGVERSION ]];then
+			SCRIPTPKGVERSION="$LFSVERSION"
+		fi
 		SCRIPTPKGTARURL=${SCRIPTPKGARCHIVEDIR}
+		if [[ -z "$NAME" ]];then
+			SCRIPTTARNAME="\$PKGNAME"
+		else
+			SCRIPTTARNAME="$(basename "$bn" .git)"
+		fi
 	fi
+
+
 
 if false;then 
 echo -------------------
 	echo SCRIPTPKGNAME=$SCRIPTPKGNAME
+	echo SCRIPTTARNAME=$SCRIPTTARNAME
 	echo SCRIPTPKGVERSION=$SCRIPTPKGVERSION
 	echo SCRIPTPKGSECTION=$SCRIPTPKGSECTION
 	echo SCRIPTPKGSUFFIX=$SCRIPTPKGSUFFIX
@@ -206,6 +225,9 @@ echo -------------------
 	echo SCRIPTPKGARCHIVEDIR=$SCRIPTPKGARCHIVEDIR
 	echo SCRIPTPKGTARURL=$SCRIPTPKGTARURL
 	echo GITTAG=$GITTAG
+echo ===================
+	echo $NAME
+	echo $PKGVERSION
 echo +++++++++++++++++++
 fi
 }

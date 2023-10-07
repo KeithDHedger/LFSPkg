@@ -55,7 +55,6 @@ init ()
 	SUFFIX=${SUFFIX:-"LFSPKG"}
 	SECTION=${SECTION:-"SYS"}
 	BUILD=${BUILD:-1}
-	NAME="${NAME:-A_Pkg}"
 	VERSION="${VERSION:-0.0.1}"
 	OUTPUT=${OUTPUT:-"$TMP"}
 	ROOTDIR=${ROOTDIR:-"/"}
@@ -747,6 +746,7 @@ main ()
 	fi
 
 	if [ "X$TEMPLATE" != "X" ];then
+		export NAME PKGVERSION
 		$LFSMAKETEMPLATE $TEMPLATE ${OPTS[@]}
 		return
 	fi

@@ -1,4 +1,5 @@
 1.0.0
+Added uses -n and -p options to template to set optionalpackagename and version.
 Added git commit and tag options.
 Added pip option to templates.
 Tidied Makefile.
