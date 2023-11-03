@@ -1,4 +1,6 @@
 1.0.0
+Removed setting TMP in LFSFunctions.
+Fixed minor bug in Makefile.
 Added uses -n and -p options to template to set optionalpackagename and version.
 Added git commit and tag options.
 Added pip option to templates.

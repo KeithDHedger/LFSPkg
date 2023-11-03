@@ -76,8 +76,9 @@ if [ $PIBUILD -eq 1 ];then
 	fi
 fi
 
-TMP=${TMP:-/tmp/LFS}
-OUTPUT=${OUTPUT:-$TMP}
+#TMP=${TMP:-/tmp/LFS}
+mkdir -p /tmp/LFS
+OUTPUT=${OUTPUT:-/tmp/LFS}
 PKGARCHIVES=${PKGARCHIVES:-$OUTPUT}
 USEROPTIONS=${USEROPTIONS:-"/etc/pkgoptions"}
 #XORG_PREFIX=${XORG_PREFIX:-/usr}
@@ -146,9 +147,10 @@ sanitycheck ()
 
 sanitycheck
 
-export TMP OUTPUT
+#export TMP OUTPUT
+export OUTPUT
 SCRIPTLOG=${SCRIPTLOG:-0}
-LOGDIR=${LOGDIR:-"/tmp/logs"}
+LOGDIR=${LOGDIR:-"/tmp/LFS/logs"}
 
 scriptLog ()
 {

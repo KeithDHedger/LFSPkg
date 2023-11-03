@@ -14,12 +14,12 @@ RCFILE="lfspkg.rc"
 SETUP="LFSPkgSetUp"
 TEMPLATES="LFSMakeTemplate"
 
+all:
+	g++ -o $(HELPER) $(HELPERCODE)
+
 devbuild:
 	sed -r -i 's/[0-9]+.[0-9]+.[0-9]+/'"$(VERSION)"'/' $(CONF)
 	makeswitch -c $(CONF)
-	g++ -o $(HELPER) $(HELPERCODE)
-
-all:
 	g++ -o $(HELPER) $(HELPERCODE)
 
 clean:
